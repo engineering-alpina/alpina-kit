@@ -39,15 +39,18 @@ installs it. This file is the rules.
   else in the kit may depend on it.
 - `@alpina/contracts` — the shapes services exchange, plus the registry. May
   depend on `zod` and nothing else in the kit.
-- `@alpina/ui` (Phase 4) — will depend on `contracts` for `services.json` and on
-  nothing else.
+- `@alpina/ui` — tokens, shell and primitives. Depends on `contracts` for the
+  registry and on nothing else in the kit. React, `@base-ui/react` and
+  `lucide-react` are peers; `next` and `tailwindcss` are optional peers it never
+  imports. It renders no session state and fetches nothing.
 
 ### The intra-kit dependency rule
 
 **A kit package never lists another kit package in `dependencies`.** It goes in
 `devDependencies` as `workspace:*` (so the build resolves it) plus
-`peerDependencies` with a version range (so a consumer resolves it). `@alpina/auth`
-is the one case today. `pnpm release` refuses to tag if this is violated.
+`peerDependencies` with a version range (so a consumer resolves it).
+`@alpina/auth` and `@alpina/ui` are the two cases today. `pnpm release` refuses
+to tag if this is violated.
 
 The rule is not taste. It comes from how pnpm actually installs a git dep with a
 `path:` fragment, established by installing the kit into a scratch project:
@@ -142,6 +145,14 @@ pnpm test && pnpm typecheck && pnpm build
   `pnpm add "@alpina/auth@git+file:///path/to/clone#v0.9.9&path:/packages/auth"`
   in a throwaway project. Every rule above came out of that loop, and two
   designs that read correctly failed it.
+- `@alpina/ui` ships CSS from `styles/`, not from `dist/`, because tsc does not
+  copy it and there is no reason to build a file that is already final. Both
+  directories are in `files`; the token file's `@source "../dist"` depends on
+  them staying siblings.
+- Tailwind ignores node_modules unless told otherwise, and the kit's class names
+  live in compiled JS. `tokens.css` carries its own `@source "../dist"` so a
+  consumer does not have to know that. A bundler that does not honour it needs
+  `@source "../node_modules/@alpina/ui/dist";` in the app's own stylesheet.
 - The canonical `FLEET.md`, `DESIGN-SYSTEM.md` and `services.json` live here,
   but upwork-crm and team.alpina.solutions still read their own copies until the
   adoption task turns those into pointers. Edit here first, then mirror, until

@@ -1,0 +1,258 @@
+/*
+ * @alpina/ui — the whole design canon in one import.
+ *
+ *   @import 'tailwindcss';
+ *   @import '@alpina/ui/tokens.css';
+ *
+ * Canon: packages/contracts/docs/DESIGN-SYSTEM.md. One principle, "a technical
+ * document, not a landing page": nothing above 2px of radius, no box-shadow, no
+ * coloured card borders, colour only as a dot or badge text.
+ *
+ * Reconciled from two donors that had drifted apart:
+ *   - upwork-crm  viewer/app/globals.css  (the shadcn/Tailwind token surface)
+ *   - portal      src/app/(frontend)/styles/tokens.css  (the canon names)
+ * Where they disagreed, DESIGN-SYSTEM.md decided. The differences and the calls
+ * made on each are listed in the kit README.
+ *
+ * Internal services are light-only. The dark block below is defined but never
+ * activates on its own: it is keyed on an explicit `data-theme="dark"` on
+ * <html>, which no internal app sets, and there is deliberately no
+ * prefers-color-scheme rule.
+ */
+
+/* Tailwind scans node_modules only when told to, and the kit's classes live in
+ * compiled JS. Path is resolved relative to THIS file, so it keeps working
+ * wherever pnpm links the package. A consumer whose bundler does not honour it
+ * adds `@source "../node_modules/@alpina/ui/dist";` to its own stylesheet. */
+@source "../dist";
+
+/* Dark is an attribute on <html>, per the canon. The donor viewer used a `.dark`
+ * class (next-themes attribute="class"); adopting means switching that to
+ * attribute="data-theme", or leaving forcedTheme="light" so it never fires. */
+@custom-variant dark (&:is([data-theme='dark'] *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-elevated: var(--elevated);
+  --color-body: var(--body);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Every step of the radius scale is 2px. `rounded-xl` in a vendored component
+   * is therefore still 2px, which is why the ported primitives could keep their
+   * shadcn class names unedited. */
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 2px;
+  --radius-3xl: 2px;
+  --radius-4xl: 2px;
+}
+
+@theme {
+  /* `0 0 #0000` and not `none`. Tailwind composes shadow utilities into a single
+   * `box-shadow: var(--tw-inset-shadow), var(--tw-ring-shadow), var(--tw-shadow)`
+   * declaration, and one `none` in that list invalidates the whole thing, taking
+   * focus rings with it. The portal donor had `--shadow-md: none`, which is safe
+   * only because it never reaches a Tailwind utility. The canon-named `--shadow`
+   * for hand-written CSS is in :root below and is `none`. */
+  --shadow-2xs: 0 0 #0000;
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+  --shadow-md: 0 0 #0000;
+  --shadow-lg: 0 0 #0000;
+  --shadow-xl: 0 0 #0000;
+  --shadow-2xl: 0 0 #0000;
+  --inset-shadow-2xs: 0 0 #0000;
+  --inset-shadow-xs: 0 0 #0000;
+  --inset-shadow-sm: 0 0 #0000;
+  --drop-shadow-xs: 0 0 #0000;
+  --drop-shadow-sm: 0 0 #0000;
+  --drop-shadow-md: 0 0 #0000;
+  --drop-shadow-lg: 0 0 #0000;
+
+  /* Geist and Geist Mono. The kit reads the font family through
+   * `--font-geist-sans` / `--font-geist-mono`, which is what next/font should be
+   * asked to define:
+   *
+   *   const sans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
+   *
+   * Naming the next/font variable `--font-sans` instead (the upwork-crm donor
+   * does) collides with Tailwind's own theme variable of that name on :root, and
+   * which one wins comes down to stylesheet order. The indirection removes the
+   * question. Anything not loaded falls through to the literal families that the
+   * `geist` npm package registers, then to the system stack. */
+  --font-sans:
+    var(--font-geist-sans, 'Geist'), 'Geist Fallback', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', sans-serif;
+  --font-mono:
+    var(--font-geist-mono, 'Geist Mono'), 'Geist Mono Fallback', ui-monospace, 'SF Mono', monospace;
+  --font-heading:
+    var(--font-geist-sans, 'Geist'), 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  /* Neutrals in oklch, brand blue as the one hex. */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  /* Paragraph text, one step lighter than headings. */
+  --body: oklch(0.42 0 0);
+  /* Table row and hover backing. */
+  --elevated: oklch(0.968 0 0);
+  --muted: oklch(0.968 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --secondary: oklch(0.968 0 0);
+  --secondary-foreground: oklch(0.42 0 0);
+  --accent: oklch(0.968 0 0);
+  --accent-foreground: oklch(0.145 0 0);
+
+  /* Alpina Tech brand blue, taken from the logo. The only hex in the file. */
+  --primary: #3c49ec;
+  --primary-foreground: oklch(0.985 0 0);
+  --primary-soft: color-mix(in oklab, var(--primary) 8%, transparent);
+
+  --destructive: oklch(0.577 0.245 27.325);
+  --success: oklch(0.55 0.15 155);
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.72 0.13 75);
+  --warning-foreground: oklch(0.2 0.05 75);
+
+  --border: oklch(0.885 0 0);
+  --border-soft: oklch(0.94 0 0);
+  --input: oklch(0.92 0 0);
+  --ring: color-mix(in oklab, var(--primary) 35%, transparent);
+
+  /* Outline hues. Dot, badge text and Mermaid stroke only, never a card fill. */
+  --chart-1: oklch(0.55 0.14 264);
+  --chart-2: oklch(0.65 0.12 150);
+  --chart-3: oklch(0.75 0.12 75);
+  --chart-4: oklch(0.62 0.14 17);
+  --chart-5: oklch(0.65 0.12 196);
+
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: #3c49ec;
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.945 0 0);
+  --sidebar-accent-foreground: oklch(0.145 0 0);
+  --sidebar-border: oklch(0.885 0 0);
+  --sidebar-ring: color-mix(in oklab, var(--primary) 35%, transparent);
+
+  /* Flat system: sharp corners, hairline rules, no depth. */
+  --radius: 2px;
+  --shadow: none;
+
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color-scheme: light;
+}
+
+/*
+ * Defined, not activated. Internal services are light-only by fleet rule, so
+ * nothing sets data-theme="dark" and this block never applies. It exists for the
+ * client-facing surfaces that may want it, and so the values live with the rest
+ * of the canon rather than being invented a second time.
+ */
+[data-theme='dark'] {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.178 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.178 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --body: oklch(0.8 0 0);
+  --elevated: oklch(0.245 0 0);
+  --muted: oklch(0.245 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --secondary: oklch(0.245 0 0);
+  --secondary-foreground: oklch(0.8 0 0);
+  --accent: oklch(0.245 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+
+  --primary: #8b93ff;
+  --primary-foreground: #12142e;
+  --primary-soft: color-mix(in oklab, var(--primary) 14%, transparent);
+
+  --destructive: oklch(0.704 0.191 22.216);
+  --success: oklch(0.72 0.15 155);
+  --success-foreground: oklch(0.145 0 0);
+  --warning: oklch(0.8 0.13 75);
+  --warning-foreground: oklch(0.145 0 0);
+
+  --border: oklch(1 0 0 / 15%);
+  --border-soft: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: color-mix(in oklab, var(--primary) 40%, transparent);
+
+  --sidebar: oklch(0.178 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: #8b93ff;
+  --sidebar-primary-foreground: #12142e;
+  --sidebar-accent: oklch(0.245 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 15%);
+  --sidebar-ring: color-mix(in oklab, var(--primary) 40%, transparent);
+
+  --shadow: none;
+
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+::selection {
+  background: color-mix(in oklab, var(--primary) 20%, transparent);
+  color: var(--foreground);
+}
