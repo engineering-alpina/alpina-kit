@@ -94,7 +94,14 @@ for (const file of [
 }
 
 git('add', '-A');
-git('commit', '-m', `chore(release): ${tag}`);
+// The first release, or a re-tag of an already-bumped tree, changes no version
+// and leaves nothing staged. `git commit` exits non-zero on an empty commit, so
+// only commit when the bump actually moved something; the tag still gets cut.
+if (git('status', '--porcelain')) {
+  git('commit', '-m', `chore(release): ${tag}`);
+} else {
+  console.log(`versions already at ${version}; tagging without a bump commit`);
+}
 git('tag', '-a', tag, '-m', `alpina-kit ${tag}`);
 
 console.log(`\ntagged ${tag}. Push with:\n  git push origin main ${tag}`);
