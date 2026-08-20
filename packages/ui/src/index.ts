@@ -20,6 +20,17 @@
 export { cn } from './lib/cn.js';
 export { useIsMobile, MOBILE_BREAKPOINT } from './lib/use-mobile.js';
 
+export { AppShell, ShellTopbar, type AppShellProps, type ShellBrand } from './shell/app-shell.js';
+export {
+  ModuleSwitcher,
+  moduleServices,
+  serviceIcon,
+  NON_MODULE_SERVICE_IDS,
+  type ModuleSwitcherProps,
+  type ModuleServicesOptions,
+} from './shell/module-switcher.js';
+export { isActive, type NavGroup, type NavItem, type LinkRenderer } from './shell/nav.js';
+
 export {
   Avatar,
   AvatarImage,
