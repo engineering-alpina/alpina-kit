@@ -1,0 +1,45 @@
+{
+  "name": "@alpina/contracts",
+  "version": "0.1.0",
+  "description": "Zod schemas and degrade-safe typed clients for cross-service reads, plus the canonical fleet registry and design system.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "files": [
+    "dist",
+    "docs"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./upwork-crm": {
+      "types": "./dist/upwork-crm.d.ts",
+      "import": "./dist/upwork-crm.js"
+    },
+    "./stakeholders": {
+      "types": "./dist/stakeholders.d.ts",
+      "import": "./dist/stakeholders.js"
+    },
+    "./registry": {
+      "types": "./dist/registry.d.ts",
+      "import": "./dist/registry.js"
+    },
+    "./services.json": "./dist/data/services.json",
+    "./FLEET.md": "./docs/FLEET.md",
+    "./DESIGN-SYSTEM.md": "./docs/DESIGN-SYSTEM.md"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/copy-data.mjs",
+    "prepare": "pnpm run build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
