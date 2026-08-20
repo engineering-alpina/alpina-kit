@@ -45,8 +45,28 @@ No registry server. This follows the `fleet-config` precedent already used for
 prettier and eslint across the fleet. Packages build to `dist` on install via
 their `prepare` script, so a consumer gets compiled JS and `.d.ts` files.
 
-`@alpina/auth` depends on `@alpina/service-kit`, so pinning `auth` alone is not
-enough: pin both, at the same tag.
+Three things a consumer has to get right. All three were established by
+installing the kit into a scratch project, not by reading docs:
+
+**1. Allow the build.** pnpm 11 refuses to run a git dependency's `prepare`
+unless the package is allowlisted, and the install fails outright with
+`ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED`. In the consumer's
+`pnpm-workspace.yaml`:
+
+```yaml
+allowBuilds:
+  '@alpina/service-kit': true
+  '@alpina/auth': true
+  '@alpina/contracts': true
+```
+
+**2. Pin every kit package you use, at one tag.** `@alpina/auth` declares
+`@alpina/service-kit` as a peer dependency, so pinning `auth` alone leaves pnpm
+hunting for it on the public registry, where it does not exist.
+
+**3. Bring your own drizzle for `@alpina/service-kit/db`.** `drizzle-orm` and
+`postgres` are optional peers and only that subpath needs them, so an app with
+no database can use the rest of the package without installing either.
 
 ### Examples
 
@@ -124,8 +144,10 @@ pnpm release 0.2.0
 git push origin main v0.2.0
 ```
 
-The script verifies (typecheck, test, build), then makes two commits and tags
-the first: `chore(release): v0.2.0` carries the rewritten `workspace:*` deps as
-real git specs, which is what consumers install; `chore: back to the workspace
-protocol` restores them so local development keeps working. See CLAUDE.md for
-the versioning rules and the rest of the checklist.
+The script verifies (typecheck, test, build), checks that no package lists
+another kit package in `dependencies`, bumps every version to the same number,
+commits and tags. See CLAUDE.md for the versioning rules, the intra-kit
+dependency rule and the rest of the checklist.
+
+Nothing is published anywhere. An untagged change reaches nobody, and a tag,
+once pushed, is never moved.

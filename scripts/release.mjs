@@ -1,19 +1,23 @@
 #!/usr/bin/env node
 /**
- * Cuts a kit release.
+ * Cuts a kit release: verify, bump every version to the same number, commit, tag.
  *
- * Consumers pin packages as git deps
- * (`github:engineering-alpina/alpina-kit#v0.2.0&path:/packages/auth`), and a
- * git dep is installed exactly as the tagged tree looks. That breaks on
- * `workspace:*`, which only pnpm inside this repo can resolve. So the tagged
- * commit must carry real git specs, while the branch keeps the workspace
- * protocol or local development stops working.
+ * Why the tagged tree keeps `workspace:*` rather than rewriting it into git
+ * specs, which is the obvious-looking thing to do and is wrong here:
  *
- * The script therefore makes two commits and tags the first:
+ * pnpm prepares a git dependency by fetching the WHOLE repo, running
+ * `pnpm install` at its root (all workspace projects), then extracting the
+ * subdirectory named by `path:`. So `workspace:*` is exactly what that install
+ * needs, and a git spec instead makes it try to re-fetch this same repo from
+ * GitHub over ssh, which fails on any machine that authenticates over https
+ * (all of ours) and in every CI and Docker build.
  *
- *   1. `chore(release): v<version>` — versions bumped, workspace deps rewritten
- *      to git specs pinned at this tag. This is what consumers install.
- *   2. `chore: back to the workspace protocol` — deps rewritten back.
+ * What a consumer must not see is `workspace:*` in a package's `dependencies`,
+ * because pnpm then looks for a workspace member that is not there. Hence the
+ * one structural rule this repo lives by: intra-kit deps go in
+ * `devDependencies` (for the prepare install) plus a versioned
+ * `peerDependencies` entry (for the consumer), never in `dependencies`.
+ * `pnpm test` in a scratch consumer is how that was established; see CLAUDE.md.
  *
  * Usage: pnpm release 0.2.0
  */
@@ -39,7 +43,7 @@ if (git('status', '--porcelain')) {
   process.exit(1);
 }
 if (git('tag', '--list', tag)) {
-  console.error(`${tag} already exists`);
+  console.error(`${tag} already exists. Tags are never moved; cut a new patch instead.`);
   process.exit(1);
 }
 
@@ -48,52 +52,51 @@ const dirs = readdirSync(packagesDir, { withFileTypes: true })
   .filter((d) => d.isDirectory())
   .map((d) => d.name);
 
-/** name -> directory, so a workspace dep can be turned into its git path. */
-const byName = new Map();
+const names = new Set();
 for (const dir of dirs) {
   const manifest = JSON.parse(readFileSync(join(packagesDir, dir, 'package.json'), 'utf8'));
-  byName.set(manifest.name, dir);
+  names.add(manifest.name);
 }
 
-const DEP_FIELDS = ['dependencies', 'devDependencies', 'peerDependencies'];
-
-function rewrite(toGitSpec) {
+/** Guards the rule the whole distribution model rests on. */
+function assertNoWorkspaceRuntimeDeps() {
+  const broken = [];
   for (const dir of dirs) {
-    const file = join(packagesDir, dir, 'package.json');
-    const manifest = JSON.parse(readFileSync(file, 'utf8'));
-    manifest.version = version;
-    for (const field of DEP_FIELDS) {
-      const deps = manifest[field];
-      if (!deps) continue;
-      for (const name of Object.keys(deps)) {
-        if (!byName.has(name)) continue;
-        deps[name] = toGitSpec
-          ? `${REMOTE}#${tag}&path:/packages/${byName.get(name)}`
-          : 'workspace:*';
-      }
+    const manifest = JSON.parse(readFileSync(join(packagesDir, dir, 'package.json'), 'utf8'));
+    for (const name of Object.keys(manifest.dependencies ?? {})) {
+      if (names.has(name)) broken.push(`${manifest.name} -> ${name}`);
     }
-    writeFileSync(file, `${JSON.stringify(manifest, null, 2)}\n`);
   }
-  const root = join(ROOT, 'package.json');
-  const rootManifest = JSON.parse(readFileSync(root, 'utf8'));
-  rootManifest.version = version;
-  writeFileSync(root, `${JSON.stringify(rootManifest, null, 2)}\n`);
+  if (broken.length) {
+    console.error(
+      'intra-kit packages must not appear in "dependencies" (a consumer cannot resolve\n' +
+        'workspace:* and a git spec breaks prepare). Move them to devDependencies +\n' +
+        `peerDependencies:\n  ${broken.join('\n  ')}`,
+    );
+    process.exit(1);
+  }
 }
+
+assertNoWorkspaceRuntimeDeps();
 
 console.log(`> verifying before tagging ${tag}`);
 execFileSync('pnpm', ['-r', 'typecheck'], { cwd: ROOT, stdio: 'inherit' });
 execFileSync('pnpm', ['-r', 'test'], { cwd: ROOT, stdio: 'inherit' });
 execFileSync('pnpm', ['-r', 'build'], { cwd: ROOT, stdio: 'inherit' });
 
-rewrite(true);
+for (const file of [
+  join(ROOT, 'package.json'),
+  ...dirs.map((d) => join(packagesDir, d, 'package.json')),
+]) {
+  const manifest = JSON.parse(readFileSync(file, 'utf8'));
+  manifest.version = version;
+  writeFileSync(file, `${JSON.stringify(manifest, null, 2)}\n`);
+}
+
 git('add', '-A');
 git('commit', '-m', `chore(release): ${tag}`);
 git('tag', '-a', tag, '-m', `alpina-kit ${tag}`);
 
-rewrite(false);
-git('add', '-A');
-git('commit', '-m', 'chore: back to the workspace protocol');
-
 console.log(`\ntagged ${tag}. Push with:\n  git push origin main ${tag}`);
-console.log('Consumers pin, for example:');
+console.log('Consumers pin every kit package they use at this tag, for example:');
 console.log(`  "@alpina/service-kit": "${REMOTE}#${tag}&path:/packages/service-kit"`);

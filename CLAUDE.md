@@ -42,8 +42,29 @@ installs it. This file is the rules.
 - `@alpina/ui` (Phase 4) — will depend on `contracts` for `services.json` and on
   nothing else.
 
-Cross-package deps are declared `workspace:*` and rewritten to git specs by the
-release script. Keep the graph shallow; a cycle cannot be released.
+### The intra-kit dependency rule
+
+**A kit package never lists another kit package in `dependencies`.** It goes in
+`devDependencies` as `workspace:*` (so the build resolves it) plus
+`peerDependencies` with a version range (so a consumer resolves it). `@alpina/auth`
+is the one case today. `pnpm release` refuses to tag if this is violated.
+
+The rule is not taste. It comes from how pnpm actually installs a git dep with a
+`path:` fragment, established by installing the kit into a scratch project:
+
+1. pnpm fetches the **whole repo**, runs `pnpm install` at its root across every
+   workspace project, runs each package's `prepare`, then extracts only the
+   subdirectory named by `path:`.
+2. So the tagged tree must keep `workspace:*` for that root install to work.
+   Rewriting it to git specs at release time, which looks obviously right, makes
+   the prepare install try to re-fetch this repo from `git+ssh://github.com`,
+   which fails on every machine that authenticates over https. Ours all do.
+3. But a package's `dependencies` are read again in the consumer's tree, where
+   `workspace:*` has nothing to resolve against:
+   `ERR_PNPM_WORKSPACE_PKG_NOT_FOUND`.
+
+devDependencies satisfy (1) and are ignored by (3). peerDependencies satisfy (3)
+and are ignored by (1). Keep the graph shallow; a cycle cannot be released.
 
 ## Adding a contract
 
@@ -88,13 +109,15 @@ everybody at once.
 ### Cutting one
 
 ```sh
-pnpm release 0.2.0        # verify, bump, rewrite deps, tag, restore
+pnpm release 0.2.0        # verify, check the dependency rule, bump, commit, tag
 git push origin main v0.2.0
 ```
 
-Then in each consumer, one at a time, oldest-riskiest last:
+Then in each consumer, one at a time, riskiest last:
 
 ```sh
+# once per repo: allowBuilds entries in pnpm-workspace.yaml, or the install
+# fails with ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED
 pnpm add "@alpina/service-kit@github:engineering-alpina/alpina-kit#v0.2.0&path:/packages/service-kit"
 pnpm test && pnpm typecheck && pnpm build
 ```
@@ -111,6 +134,14 @@ pnpm test && pnpm typecheck && pnpm build
   `undefined`.
 - `services.json` is copied to `dist/data/` by `scripts/copy-data.mjs`, not by
   tsc. Adding another data file means adding it there.
+- A consumer must allowlist every kit package under `allowBuilds` in its
+  `pnpm-workspace.yaml`. Without it pnpm 11 will not run `prepare`, so there is
+  no `dist` and the install hard-fails rather than degrading.
+- Verify a distribution change against a real install, not by reasoning about
+  it: clone the repo to a scratch dir, `node scripts/release.mjs 0.9.9`, then
+  `pnpm add "@alpina/auth@git+file:///path/to/clone#v0.9.9&path:/packages/auth"`
+  in a throwaway project. Every rule above came out of that loop, and two
+  designs that read correctly failed it.
 - The canonical `FLEET.md`, `DESIGN-SYSTEM.md` and `services.json` live here,
   but upwork-crm and team.alpina.solutions still read their own copies until the
   adoption task turns those into pointers. Edit here first, then mirror, until
