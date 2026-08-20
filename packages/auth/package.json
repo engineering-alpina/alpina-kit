@@ -1,0 +1,41 @@
+{
+  "name": "@alpina/auth",
+  "version": "0.1.0",
+  "description": "Fleet authentication: Zitadel OIDC code+PKCE client, session cookie helpers, hashed bearer-key role verifier. Authn only, never authorization policy.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./oidc": {
+      "types": "./dist/oidc.d.ts",
+      "import": "./dist/oidc.js"
+    },
+    "./session": {
+      "types": "./dist/session.d.ts",
+      "import": "./dist/session.js"
+    },
+    "./api-keys": {
+      "types": "./dist/api-keys.d.ts",
+      "import": "./dist/api-keys.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@alpina/service-kit": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
