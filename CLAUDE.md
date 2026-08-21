@@ -69,6 +69,20 @@ The rule is not taste. It comes from how pnpm actually installs a git dep with a
 devDependencies satisfy (1) and are ignored by (3). peerDependencies satisfy (3)
 and are ignored by (1). Keep the graph shallow; a cycle cannot be released.
 
+## Editing the registry
+
+`services.json` is what every module menu in the fleet renders from, so two
+rules apply beyond "keep it true".
+
+- **`name` describes the row, `shortName` labels the menu.** If a name needs a
+  parenthetical to be accurate ("Time tracking (Kimai, vendor)"), give the row a
+  `shortName` too. Consumers call `serviceLabel()` and never `name`. A test
+  fails on any label that still shows a bracket.
+- **What belongs in a menu is not a schema question.** `NON_MODULE_SERVICE_IDS`
+  in `src/modules.ts` is the exception list, and it holds one id. If it ever
+  needs a second, add a field to the registry row instead of lengthening the
+  constant.
+
 ## Adding a contract
 
 A client goes in `@alpina/contracts` when two or more services exchange the
@@ -149,11 +163,23 @@ pnpm test && pnpm typecheck && pnpm build
   copy it and there is no reason to build a file that is already final. Both
   directories are in `files`; the token file's `@source "../dist"` depends on
   them staying siblings.
+- **Nothing a consumer reads may be declared inside `@theme`.** A browser with
+  no Tailwind build step discards the whole at-rule, so every property in it is
+  undefined rather than merely unstyled. v0.1.0 kept the fonts, radii and
+  shadows in there and alpina-portal rendered in Times. Declare the value in
+  `:root` and alias it from `@theme inline`, always pointing at a differently
+  named base var, because `--radius-md: var(--radius-md)` is a cycle that
+  resolves to nothing. Two tests in `packages/ui/test/tokens.test.ts` enforce
+  both halves.
+- A primitive that arrives using a Tailwind variant the token file does not
+  define styles nothing and says nothing about it. `tokens.css` carries the
+  base-ui `data-*` variants for that reason, and a test walks `src/` and fails
+  on any variant it does not define.
 - Tailwind ignores node_modules unless told otherwise, and the kit's class names
   live in compiled JS. `tokens.css` carries its own `@source "../dist"` so a
   consumer does not have to know that. A bundler that does not honour it needs
   `@source "../node_modules/@alpina/ui/dist";` in the app's own stylesheet.
-- The canonical `FLEET.md`, `DESIGN-SYSTEM.md` and `services.json` live here,
-  but upwork-crm and team.alpina.solutions still read their own copies until the
-  adoption task turns those into pointers. Edit here first, then mirror, until
-  the pointers land.
+- The canonical `FLEET.md`, `DESIGN-SYSTEM.md` and `services.json` live here.
+  upwork-crm's `docs/architecture/` copies are pointers as of the v0.1.0
+  adoption; `team.alpina.solutions/DESIGN-SYSTEM.md` is still a real file. Edit
+  here first, then mirror, until that last pointer lands.

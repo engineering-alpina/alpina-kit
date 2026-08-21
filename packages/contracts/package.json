@@ -25,6 +25,10 @@
       "types": "./dist/registry.d.ts",
       "import": "./dist/registry.js"
     },
+    "./modules": {
+      "types": "./dist/modules.d.ts",
+      "import": "./dist/modules.js"
+    },
     "./services.json": "./dist/data/services.json",
     "./FLEET.md": "./docs/FLEET.md",
     "./DESIGN-SYSTEM.md": "./docs/DESIGN-SYSTEM.md"

@@ -20,6 +20,15 @@ export const ServiceSchema = z
   .object({
     id: z.string(),
     name: z.string(),
+    /**
+     * What a sidebar should call it, when `name` is too long or carries
+     * deployment metadata. "Time tracking (Kimai, vendor)" wraps to two lines in
+     * a module menu and "Twenty CRM (vendor)" reads oddly as a menu item; the
+     * "(vendor)" part describes how the thing is run, not what to click.
+     * Consumers read `serviceLabel()`, never `name` directly, so no app has to
+     * trim strings of its own.
+     */
+    shortName: z.string().optional(),
     /** null for local tools with no host. */
     domain: z.string().nullable(),
     /** Path under `~/github/`, or a note for vendor apps. */

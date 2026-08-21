@@ -1,8 +1,23 @@
 /*
  * @alpina/ui — the whole design canon in one import.
  *
+ * With Tailwind:
+ *
  *   @import 'tailwindcss';
  *   @import '@alpina/ui/tokens.css';
+ *
+ * Without Tailwind (the portal, any static page, a Docusaurus theme):
+ *
+ *   @import '@alpina/ui/tokens.css';
+ *
+ * Both work. Every token is declared in a plain `:root` block, and the `@theme`
+ * block below only aliases those names into Tailwind's theme namespaces. That
+ * split is load-bearing, not tidiness: a browser with no Tailwind build step
+ * skips an unknown at-rule WHOLE, so anything declared inside `@theme` is never
+ * defined at all. v0.1.0 kept the font families, the radius scale and the shadow
+ * scale in there, and the portal measured `--font-sans` resolving to the empty
+ * string with the body falling back to Times. Nothing a consumer reads may live
+ * inside `@theme` again; `test/tokens.test.ts` fails the build if it does.
  *
  * Canon: packages/contracts/docs/DESIGN-SYSTEM.md. One principle, "a technical
  * document, not a landing page": nothing above 2px of radius, no box-shadow, no
@@ -31,6 +46,42 @@
  * attribute="data-theme", or leaving forcedTheme="light" so it never fires. */
 @custom-variant dark (&:is([data-theme='dark'] *));
 
+/*
+ * base-ui state variants, so the primitives can style themselves.
+ *
+ * The compiled dialog, sheet, sidebar, tabs, tooltip and separator use
+ * `data-open:`, `data-closed:`, `data-active:`, `data-horizontal:` and
+ * `data-vertical:`. Those are not Tailwind built-ins; they come from
+ * `shadcn/tailwind.css`, and a consumer that imported only this file got
+ * dialogs and tooltips with no open or closed styling and nothing to explain
+ * it. Tailwind drops an unknown variant silently, so the failure is invisible.
+ *
+ * Restated here (from shadcn, MIT) so the package is self-contained. Redefining
+ * a custom variant is an override rather than a conflict, so a consumer that
+ * also imports `shadcn/tailwind.css` (upwork-crm does) is unaffected.
+ *
+ * Animation is the one thing still not self-contained: the dialog, sheet and
+ * tooltip carry `animate-in` / `fade-in-0` / `zoom-in-95` / `slide-in-from-*`
+ * from `tw-animate-css`. Without it they open and close with no transition,
+ * which is a cosmetic loss and not a broken component, so the kit does not
+ * vendor a whole animation library for it. Add `@import 'tw-animate-css';` if
+ * you want the motion.
+ */
+@custom-variant data-open (&:where([data-state='open'], [data-open]:not([data-open='false'])));
+@custom-variant data-closed (&:where([data-state='closed'], [data-closed]:not([data-closed='false'])));
+@custom-variant data-active (&:where([data-state='active'], [data-active]:not([data-active='false'])));
+@custom-variant data-horizontal (&:where([data-orientation='horizontal']));
+@custom-variant data-vertical (&:where([data-orientation='vertical']));
+
+/*
+ * Tailwind's theme namespaces, every one of them an alias for a `:root` name
+ * below. `inline` means a utility inlines the referenced var rather than adding
+ * another hop, which is what lets `--primary` be overridden per subtree.
+ *
+ * An alias always points at a DIFFERENTLY named base var. `--radius-md:
+ * var(--radius-md)` would be a cycle and the property would resolve to nothing,
+ * which is why the scales here hang off `--radius` and `--shadow-flat`.
+ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -72,59 +123,33 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Every step of the radius scale is 2px. `rounded-xl` in a vendored component
-   * is therefore still 2px, which is why the ported primitives could keep their
-   * shadcn class names unedited. */
-  --radius-xs: 2px;
-  --radius-sm: 2px;
-  --radius-md: 2px;
-  --radius-lg: 2px;
-  --radius-xl: 2px;
-  --radius-2xl: 2px;
-  --radius-3xl: 2px;
-  --radius-4xl: 2px;
-}
+  --font-sans: var(--sans);
+  --font-mono: var(--mono);
+  --font-heading: var(--heading);
 
-@theme {
-  /* `0 0 #0000` and not `none`. Tailwind composes shadow utilities into a single
-   * `box-shadow: var(--tw-inset-shadow), var(--tw-ring-shadow), var(--tw-shadow)`
-   * declaration, and one `none` in that list invalidates the whole thing, taking
-   * focus rings with it. The portal donor had `--shadow-md: none`, which is safe
-   * only because it never reaches a Tailwind utility. The canon-named `--shadow`
-   * for hand-written CSS is in :root below and is `none`. */
-  --shadow-2xs: 0 0 #0000;
-  --shadow-xs: 0 0 #0000;
-  --shadow-sm: 0 0 #0000;
-  --shadow-md: 0 0 #0000;
-  --shadow-lg: 0 0 #0000;
-  --shadow-xl: 0 0 #0000;
-  --shadow-2xl: 0 0 #0000;
-  --inset-shadow-2xs: 0 0 #0000;
-  --inset-shadow-xs: 0 0 #0000;
-  --inset-shadow-sm: 0 0 #0000;
-  --drop-shadow-xs: 0 0 #0000;
-  --drop-shadow-sm: 0 0 #0000;
-  --drop-shadow-md: 0 0 #0000;
-  --drop-shadow-lg: 0 0 #0000;
+  --radius-xs: var(--radius);
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
+  --radius-2xl: var(--radius);
+  --radius-3xl: var(--radius);
+  --radius-4xl: var(--radius);
 
-  /* Geist and Geist Mono. The kit reads the font family through
-   * `--font-geist-sans` / `--font-geist-mono`, which is what next/font should be
-   * asked to define:
-   *
-   *   const sans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
-   *
-   * Naming the next/font variable `--font-sans` instead (the upwork-crm donor
-   * does) collides with Tailwind's own theme variable of that name on :root, and
-   * which one wins comes down to stylesheet order. The indirection removes the
-   * question. Anything not loaded falls through to the literal families that the
-   * `geist` npm package registers, then to the system stack. */
-  --font-sans:
-    var(--font-geist-sans, 'Geist'), 'Geist Fallback', ui-sans-serif, system-ui, -apple-system,
-    'Segoe UI', sans-serif;
-  --font-mono:
-    var(--font-geist-mono, 'Geist Mono'), 'Geist Mono Fallback', ui-monospace, 'SF Mono', monospace;
-  --font-heading:
-    var(--font-geist-sans, 'Geist'), 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
+  --shadow-2xs: var(--shadow-flat);
+  --shadow-xs: var(--shadow-flat);
+  --shadow-sm: var(--shadow-flat);
+  --shadow-md: var(--shadow-flat);
+  --shadow-lg: var(--shadow-flat);
+  --shadow-xl: var(--shadow-flat);
+  --shadow-2xl: var(--shadow-flat);
+  --inset-shadow-2xs: var(--shadow-flat);
+  --inset-shadow-xs: var(--shadow-flat);
+  --inset-shadow-sm: var(--shadow-flat);
+  --drop-shadow-xs: var(--shadow-flat);
+  --drop-shadow-sm: var(--shadow-flat);
+  --drop-shadow-md: var(--shadow-flat);
+  --drop-shadow-lg: var(--shadow-flat);
 }
 
 :root {
@@ -178,9 +203,75 @@
   --sidebar-border: oklch(0.885 0 0);
   --sidebar-ring: color-mix(in oklab, var(--primary) 35%, transparent);
 
-  /* Flat system: sharp corners, hairline rules, no depth. */
+  /*
+   * Geist and Geist Mono. The kit reads the family through `--font-geist-sans`
+   * and `--font-geist-mono`, which is what next/font should be asked to define:
+   *
+   *   const sans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
+   *
+   * Naming the next/font variable `--font-sans` instead (the upwork-crm donor
+   * does) collides with Tailwind's own theme variable of that name on :root, and
+   * which one wins comes down to stylesheet order. The indirection removes the
+   * question. Anything not loaded falls through to the literal families that the
+   * `geist` npm package registers, then to the system stack.
+   *
+   * `--sans`, `--mono` and `--heading` are the base names. `--font-*` mirrors
+   * them, so both spellings resolve with or without Tailwind.
+   */
+  --sans:
+    var(--font-geist-sans, 'Geist'), 'Geist Fallback', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', sans-serif;
+  --mono:
+    var(--font-geist-mono, 'Geist Mono'), 'Geist Mono Fallback', ui-monospace, 'SF Mono', monospace;
+  --heading:
+    var(--font-geist-sans, 'Geist'), 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--sans);
+  --font-mono: var(--mono);
+  --font-heading: var(--heading);
+
+  /*
+   * Flat system: sharp corners, hairline rules, no depth.
+   *
+   * One step, 2px, and every name in the scale points at it. `rounded-xl` in a
+   * vendored component is therefore still 2px, which is why the ported
+   * primitives could keep their shadcn class names unedited.
+   */
   --radius: 2px;
+  --radius-xs: var(--radius);
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
+  --radius-2xl: var(--radius);
+  --radius-3xl: var(--radius);
+  --radius-4xl: var(--radius);
+
+  /*
+   * `--shadow` is the canon name hand-written CSS reads, and it is `none`.
+   *
+   * `--shadow-flat` is the same idea spelled for Tailwind, and it is `0 0 #0000`
+   * rather than `none` on purpose. Tailwind composes shadow utilities into one
+   * `box-shadow: var(--tw-inset-shadow), var(--tw-ring-shadow), var(--tw-shadow)`
+   * declaration, and a single `none` in that list invalidates the whole thing,
+   * taking focus rings with it. The portal donor had `--shadow-md: none`, which
+   * is safe only because it never reaches a Tailwind utility.
+   */
   --shadow: none;
+  --shadow-flat: 0 0 #0000;
+  --shadow-2xs: var(--shadow-flat);
+  --shadow-xs: var(--shadow-flat);
+  --shadow-sm: var(--shadow-flat);
+  --shadow-md: var(--shadow-flat);
+  --shadow-lg: var(--shadow-flat);
+  --shadow-xl: var(--shadow-flat);
+  --shadow-2xl: var(--shadow-flat);
+  --inset-shadow-2xs: var(--shadow-flat);
+  --inset-shadow-xs: var(--shadow-flat);
+  --inset-shadow-sm: var(--shadow-flat);
+  --drop-shadow-xs: var(--shadow-flat);
+  --drop-shadow-sm: var(--shadow-flat);
+  --drop-shadow-md: var(--shadow-flat);
+  --drop-shadow-lg: var(--shadow-flat);
 
   --dur-fast: 120ms;
   --dur-base: 180ms;

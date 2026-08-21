@@ -66,3 +66,13 @@ export {
   type Registry,
   type Service,
 } from './registry.js';
+
+export {
+  NON_MODULE_SERVICE_IDS,
+  SERVICE_ICON_NAMES,
+  FALLBACK_SERVICE_ICON_NAME,
+  serviceIconName,
+  serviceLabel,
+  moduleServices,
+  type ModuleServicesOptions,
+} from './modules.js';

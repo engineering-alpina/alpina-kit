@@ -1,7 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import { navigableServices, type Service } from '@alpina/contracts';
+import {
+  FALLBACK_SERVICE_ICON_NAME,
+  moduleServices,
+  serviceIconName,
+  serviceLabel,
+  type ModuleServicesOptions,
+} from '@alpina/contracts';
 import {
   ContactIcon,
   ExternalLinkIcon,
@@ -38,54 +44,32 @@ import {
  * It reads the registry, which is a JSON file compiled into the bundle. Nothing
  * here fetches, so a peer being down cannot empty another service's navigation
  * (FLEET.md rule 5, the degrade rule).
- */
-
-/**
- * Services that are live and hosted but are not modules a person opens from a
- * sidebar. Today that is only the identity provider: every app already redirects
- * to it during login, and listing it as a destination invites a confused click.
  *
- * This lives here rather than in the registry because the registry describes
- * what exists, not what belongs in a menu. If the fleet grows a second case,
- * the right fix is a field on the registry row, not a longer constant.
+ * **The list itself is not defined here.** `moduleServices`, the icon names and
+ * the "not a module" ids live in `@alpina/contracts`, because recruiting is
+ * Docusaurus and cannot import a React package for two constants. v0.1.0 kept
+ * them here and recruiting copied them by hand, which was the duplication the
+ * kit exists to remove. What is left in this file is React: turning an icon name
+ * into a component, and drawing a sidebar group.
  */
-export const NON_MODULE_SERVICE_IDS: readonly string[] = ['sso'];
 
-/** A registry id that has no entry falls back to a neutral mark. */
-const SERVICE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  'upwork-crm': LayoutDashboardIcon,
-  invoicing: FileTextIcon,
-  portal: ContactIcon,
-  'comms-hub': InboxIcon,
-  recruiting: UserPlusIcon,
-  'team-registry': UsersIcon,
-  time: TimerIcon,
-  twenty: TableIcon,
-  sso: KeyRoundIcon,
+/** lucide icon name to component, so `@alpina/contracts` needs no lucide. */
+const ICONS_BY_NAME: Record<string, React.ComponentType<{ className?: string }>> = {
+  'layout-dashboard': LayoutDashboardIcon,
+  'file-text': FileTextIcon,
+  contact: ContactIcon,
+  inbox: InboxIcon,
+  'user-plus': UserPlusIcon,
+  users: UsersIcon,
+  timer: TimerIcon,
+  table: TableIcon,
+  'key-round': KeyRoundIcon,
+  [FALLBACK_SERVICE_ICON_NAME]: SquareIcon,
 };
 
-export interface ModuleServicesOptions {
-  /** The registry id of the service doing the rendering. It links to itself otherwise. */
-  currentServiceId?: string | undefined;
-  /** Extra registry ids to leave out. */
-  exclude?: readonly string[] | undefined;
-}
-
-/**
- * The switcher's list: navigable services from the registry, minus the ones that
- * are not modules, minus the app doing the rendering.
- */
-export function moduleServices(options: ModuleServicesOptions = {}): Service[] {
-  const dropped = new Set<string>([
-    ...NON_MODULE_SERVICE_IDS,
-    ...(options.exclude ?? []),
-    ...(options.currentServiceId === undefined ? [] : [options.currentServiceId]),
-  ]);
-  return navigableServices().filter((service) => !dropped.has(service.id));
-}
-
+/** The icon component for a registry id, or a neutral mark. */
 export function serviceIcon(id: string): React.ComponentType<{ className?: string }> {
-  return SERVICE_ICONS[id] ?? SquareIcon;
+  return ICONS_BY_NAME[serviceIconName(id)] ?? SquareIcon;
 }
 
 export interface ModuleSwitcherProps extends ModuleServicesOptions {
@@ -108,10 +92,14 @@ export function ModuleSwitcher({
         <SidebarMenu>
           {modules.map((service) => {
             const Icon = serviceIcon(service.id);
+            // shortName when the row has one: the registry's `name` describes a
+            // service in a table of services, so several carry a "(vendor)"
+            // suffix that wraps to two lines in a sidebar.
+            const title = serviceLabel(service);
             return (
               <SidebarMenuItem key={service.id}>
                 <SidebarMenuButton
-                  tooltip={service.name}
+                  tooltip={title}
                   data-service-id={service.id}
                   render={
                     <a
@@ -122,7 +110,7 @@ export function ModuleSwitcher({
                   }
                 >
                   <Icon />
-                  <span>{service.name}</span>
+                  <span>{title}</span>
                   <ExternalLinkIcon className="ml-auto h-3 w-3 text-muted-foreground group-data-[collapsible=icon]:hidden" />
                 </SidebarMenuButton>
               </SidebarMenuItem>

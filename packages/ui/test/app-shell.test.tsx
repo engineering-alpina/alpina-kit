@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 
 import { AppShell } from '../src/shell/app-shell.js';
 import { isActive, type NavGroup } from '../src/shell/nav.js';
-import { moduleServices } from '../src/shell/module-switcher.js';
+import { moduleServices, serviceLabel } from '@alpina/contracts';
 
 const groups: NavGroup[] = [
   {
@@ -56,8 +56,74 @@ describe('<AppShell>', () => {
     const modules = moduleServices({ currentServiceId: 'upwork-crm' });
     expect(modules.length).toBeGreaterThan(0);
     for (const service of modules) {
-      expect(within(block as HTMLElement).getByText(service.name)).toBeDefined();
+      expect(within(block as HTMLElement).getByText(serviceLabel(service))).toBeDefined();
     }
+  });
+
+  /**
+   * Both of these came back from upwork-crm as "I had to stop using AppShell".
+   * The topbar had no way to take a className, so the viewer lost the
+   * `sticky top-6` that cleared its HudBar; the module block was always
+   * appended, so it could not sit above the Docs group where it used to be.
+   */
+  it('lets the app style the topbar', () => {
+    const { container } = renderShell({ topbarClassName: 'sticky top-6' });
+    const bar = container.querySelector('[data-slot="shell-topbar"]');
+
+    expect(bar?.className).toContain('sticky');
+    expect(bar?.className).toContain('top-6');
+    // The shell's own bar classes survive the addition.
+    expect(bar?.className).toContain('border-b');
+  });
+
+  function groupOrder(container: HTMLElement): string[] {
+    return [...container.querySelectorAll('[data-sidebar="group"]')].map((group) =>
+      group.querySelector('[data-slot="module-switcher"]') ||
+      group.matches('[data-slot="module-switcher"]')
+        ? 'modules'
+        : (group.querySelector('[data-sidebar="group-label"]')?.textContent ?? ''),
+    );
+  }
+
+  it('appends the module block by default', () => {
+    const { container } = renderShell();
+    expect(groupOrder(container)).toEqual(['Workspace', 'Analytics', 'modules']);
+  });
+
+  it('puts the module block first when asked', () => {
+    const { container } = renderShell({ modulePosition: 'start' });
+    expect(groupOrder(container)).toEqual(['modules', 'Workspace', 'Analytics']);
+  });
+
+  it('inserts the module block before a numbered group', () => {
+    const { container } = renderShell({ modulePosition: 1 });
+    expect(groupOrder(container)).toEqual(['Workspace', 'modules', 'Analytics']);
+  });
+
+  it('reads a negative position as an offset from the end', () => {
+    // What upwork-crm wants: above the last group, without the app having to
+    // compute groups.length - 1 every time a section is added.
+    const { container } = renderShell({ modulePosition: -1 });
+    expect(groupOrder(container)).toEqual(['Workspace', 'modules', 'Analytics']);
+  });
+
+  it('clamps a position past either end rather than dropping the block', () => {
+    expect(groupOrder(renderShell({ modulePosition: 99 }).container)).toEqual([
+      'Workspace',
+      'Analytics',
+      'modules',
+    ]);
+    expect(groupOrder(renderShell({ modulePosition: -99 }).container)).toEqual([
+      'modules',
+      'Workspace',
+      'Analytics',
+    ]);
+  });
+
+  it('leaves the module block out entirely on "none"', () => {
+    const { container } = renderShell({ modulePosition: 'none' });
+    expect(container.querySelector('[data-slot="module-switcher"]')).toBeNull();
+    expect(groupOrder(container)).toEqual(['Workspace', 'Analytics']);
   });
 
   it('has no session-dependent behaviour of its own', () => {
