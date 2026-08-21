@@ -40,6 +40,7 @@ export const SERVICE_ICON_NAMES: Readonly<Record<string, string>> = {
   time: 'timer',
   twenty: 'table',
   sso: 'key-round',
+  hub: 'building-2',
 };
 
 /** What an id with no entry gets. A neutral mark, never a guess. */

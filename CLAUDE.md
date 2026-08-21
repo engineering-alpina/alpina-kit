@@ -71,13 +71,19 @@ and are ignored by (1). Keep the graph shallow; a cycle cannot be released.
 
 ## Editing the registry
 
-`services.json` is what every module menu in the fleet renders from, so two
+`services.json` is what every module menu in the fleet renders from, so three
 rules apply beyond "keep it true".
 
 - **`name` describes the row, `shortName` labels the menu.** If a name needs a
   parenthetical to be accurate ("Time tracking (Kimai, vendor)"), give the row a
   `shortName` too. Consumers call `serviceLabel()` and never `name`. A test
   fails on any label that still shows a bracket.
+- **`status` is load-bearing, not commentary.** `navigableServices()` keeps a
+  row whose status starts with `live`, and every service's sidebar renders from
+  that list without fetching anything. So a row marked live before its host
+  answers puts a dead link in every other service at once. A service that is
+  built but not deployed goes in as `"planned"` and is flipped when the host
+  actually responds. `hub` is the row that established this.
 - **What belongs in a menu is not a schema question.** `NON_MODULE_SERVICE_IDS`
   in `src/modules.ts` is the exception list, and it holds one id. If it ever
   needs a second, add a field to the registry row instead of lengthening the

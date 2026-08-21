@@ -1,3 +1,7 @@
 dist
 node_modules
 pnpm-lock.yaml
+
+# Captured producer responses. These are evidence: a formatter rewriting one
+# would quietly turn it into our JSON rather than theirs.
+packages/contracts/test/fixtures/*.json
