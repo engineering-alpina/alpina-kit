@@ -16,12 +16,12 @@ Phase 3.
 
 ## Packages
 
-| Package               | What it holds                                                                                              | Status |
-| --------------------- | ---------------------------------------------------------------------------------------------------------- | ------ |
-| `@alpina/service-kit` | `createDb`, lazy `getDb`, `safeEqual`, cookie helpers, zod env parsing, health handler, kill switch        | built  |
-| `@alpina/auth`        | Zitadel OIDC code+PKCE client, session cookies (stateless and DB-backed), hashed bearer-key role verifier  | built  |
-| `@alpina/contracts`   | zod schemas + degrade-safe clients for cross-service reads, the fleet registry, FLEET.md, DESIGN-SYSTEM.md | built  |
-| `@alpina/ui`          | flat design tokens, AppShell whose module switcher reads the registry, shadcn-style primitives             | built  |
+| Package               | What it holds                                                                                                                  | Status |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| `@alpina/service-kit` | `createDb`, lazy `getDb`, `safeEqual`, cookie helpers, zod env parsing, health handler, kill switch                            | built  |
+| `@alpina/auth`        | Zitadel OIDC code+PKCE client, session cookies (stateless and DB-backed), hashed bearer-key role verifier                      | built  |
+| `@alpina/contracts`   | zod schemas + degrade-safe clients for cross-service reads, the fleet registry and its module list, FLEET.md, DESIGN-SYSTEM.md | built  |
+| `@alpina/ui`          | flat design tokens, AppShell whose module switcher reads the registry, shadcn-style primitives                                 | built  |
 
 ## Consuming a package
 
@@ -70,6 +70,12 @@ no database can use the rest of the package without installing either.
 consumer, and `@alpina/contracts` pinned at the same tag. Next and Tailwind are
 optional peers: the shell takes `pathname` and a link renderer as props rather
 than importing `next`, so it renders under vitest with no router.
+
+**5. An app with no React can still use the kit.** The registry, the module
+list, the icon names and the design tokens are all reachable without it. That is
+the point of the split: `@alpina/contracts` depends on zod and nothing else, and
+`@alpina/ui/tokens.css` is plain CSS that a Tailwind build improves rather than
+requires. See "Adopting without Tailwind" and "Adopting without React" below.
 
 ### Examples
 
@@ -120,6 +126,20 @@ install; Tailwind v4 configures itself from CSS, and the file carries its own
 `@source "../dist"` so the kit's class names are scanned without the consumer
 listing a node_modules path.
 
+It also defines the base-ui state variants the primitives use (`data-open`,
+`data-closed`, `data-active`, `data-horizontal`, `data-vertical`). v0.1.0 did
+not, and since those live in `shadcn/tailwind.css`, a consumer that imported
+only `tokens.css` got dialogs and tooltips with no open or closed styling and
+nothing to explain it, because Tailwind drops an unknown variant in silence.
+upwork-crm was unaffected only because it already imported shadcn.
+
+One thing is still not self-contained. The dialog, sheet and tooltip carry
+`animate-in`, `fade-in-0`, `zoom-in-95` and `slide-in-from-*` from
+`tw-animate-css`. Without it they open and close with no transition, which is a
+cosmetic loss rather than a broken component, so the kit does not vendor an
+animation library for it. Add `@import 'tw-animate-css';` if you want the
+motion.
+
 Fonts resolve through `--font-geist-sans` / `--font-geist-mono`, so wire
 next/font under those names:
 
@@ -151,10 +171,23 @@ import { AppShell } from '@alpina/ui';
   pathname={usePathname()}
   renderLink={(href) => <Link href={href} />}
   topbar={<TenantSwitcher />}
+  topbarClassName="sticky top-6" // clears an app's own status strip
+  modulePosition={-1} // ERP block above the last group, not appended
 >
   {children}
 </AppShell>;
 ```
+
+`topbarClassName` and `modulePosition` both exist because upwork-crm hit their
+absence and stopped using `AppShell` over it. `modulePosition` takes `'start'`,
+`'end'` (the default), `'none'`, or an index to insert before; a negative index
+counts from the end. `'none'` is for an app that wants to place the exported
+`<ModuleSwitcher />` itself.
+
+Menu labels come from `serviceLabel()`, which prefers a row's `shortName` over
+its `name`. Registry names describe a service in a table of services, so several
+carry deployment metadata: "Time tracking (Kimai, vendor)" wraps to two lines in
+a sidebar. No consumer should be trimming those strings itself.
 
 **What adopting deletes.** The Alpina ERP block renders from
 `navigableServices()` in `@alpina/contracts`, so the two hand-maintained module
@@ -163,6 +196,10 @@ lists go: the `erpModules` array in upwork-crm's
 `docs/src/components/ErpNav.tsx`. They had already drifted. upwork-crm pointed
 "Recruiting" at `recruiting.alpina.solutions`, recruiting pointed "ATS" at
 `recruitment.alpina.solutions`, and only one of the two listed the CRM at all.
+
+Recruiting deletes more than its link list. Its hand-copied
+`NON_MODULE_SERVICE_IDS` and `SERVICE_ICONS` go too, now that both are in
+`@alpina/contracts` where a Docusaurus site can import them.
 
 The switcher reads the static registry and never fetches, so a peer being down
 cannot empty another service's navigation.
@@ -173,6 +210,56 @@ form and nothing else, and the only way to hold that line is for the app to
 resolve its session first and decide whether a shell renders at all. A shell
 that can render "logged out" is a shell that will one day put a route name in an
 unauthenticated HTML payload.
+
+## Adopting without Tailwind
+
+Import the token file and nothing else:
+
+```css
+@import '@alpina/ui/tokens.css';
+```
+
+Every token is declared in plain `:root`, so a browser with no build step gets
+all of them: `--sans` / `--mono` / `--heading` (also spelled `--font-sans`,
+`--font-mono`, `--font-heading`), `--radius` and its whole scale, `--shadow` and
+`--shadow-*`, and every colour. The `@theme` block does nothing but alias those
+names into Tailwind's namespaces.
+
+v0.1.0 got this wrong and alpina-portal, which has no Tailwind at all, paid for
+it. A browser does not ignore the `@theme` keyword and keep what is inside: it
+discards the whole at-rule, so every property declared in there is undefined.
+Measured on v0.1.0 in a plain HTML page, `--font-sans` came back as the empty
+string and the body rendered in Times. Measured on this version, the same page
+reports the Geist stack, `--radius-md: 2px` and `--shadow-md: 0 0 #0000`. Two
+tests hold the line: nothing a consumer reads may live inside `@theme`, and no
+`@theme` entry may carry a literal value.
+
+What plain CSS still does not get is the `@apply` rules at the bottom of the
+file (`html { @apply font-sans }` and friends), because `@apply` is a Tailwind
+directive. Set `font-family: var(--sans)` on `body` yourself, which is what the
+portal does.
+
+## Adopting without React
+
+`@alpina/contracts` has no rendering dependency, so a Docusaurus site or a
+static page can read the same fleet data the shell reads:
+
+```ts
+import { moduleServices, serviceIconName, serviceLabel } from '@alpina/contracts';
+
+for (const service of moduleServices({ currentServiceId: 'recruiting' })) {
+  // serviceIconName returns a lucide name as a string, e.g. 'layout-dashboard'.
+  // Resolve it with whatever you draw with; contracts never imports an icon set.
+  render(iconFor(serviceIconName(service.id)), serviceLabel(service), service.domain);
+}
+```
+
+`NON_MODULE_SERVICE_IDS`, `SERVICE_ICON_NAMES` and `moduleServices` lived in
+`@alpina/ui` in v0.1.0, which put them out of reach for alpina-recruiting:
+importing the React package for two constants would have pulled in React 19,
+`@base-ui/react` and the whole primitive library. So it copied them, which is
+exactly the duplication this repo exists to remove. They are data, and data
+belongs in `@alpina/contracts`.
 
 ## What moved here
 
@@ -193,10 +280,9 @@ Turning them into pointers is part of the adoption task:
   `@alpina/ui/tokens.css` is that document expressed as CSS, and its test fails
   on any radius above 2px or any shadow that draws.
 
-One known-stale row travelled with the registry: `sso` carries
-`"status": "live-unused-by-apps"`, which has been wrong since SSO went live on
-2026-08-18. Fixing it is Phase 0 docs work in upwork-crm, so the row is copied
-as-is rather than silently corrected here.
+The registry here is current. The `sso` row reads
+`"status": "live (fleet login since 2026-08-18)"`, so the note that used to
+stand here about a stale row travelling with the copy no longer applies.
 
 ## Working in this repo
 

@@ -78,7 +78,8 @@ describe('<AppShell>', () => {
 
   function groupOrder(container: HTMLElement): string[] {
     return [...container.querySelectorAll('[data-sidebar="group"]')].map((group) =>
-      group.querySelector('[data-slot="module-switcher"]') || group.matches('[data-slot="module-switcher"]')
+      group.querySelector('[data-slot="module-switcher"]') ||
+      group.matches('[data-slot="module-switcher"]')
         ? 'modules'
         : (group.querySelector('[data-sidebar="group-label"]')?.textContent ?? ''),
     );
