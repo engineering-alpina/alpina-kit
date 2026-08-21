@@ -47,6 +47,33 @@
 @custom-variant dark (&:is([data-theme='dark'] *));
 
 /*
+ * base-ui state variants, so the primitives can style themselves.
+ *
+ * The compiled dialog, sheet, sidebar, tabs, tooltip and separator use
+ * `data-open:`, `data-closed:`, `data-active:`, `data-horizontal:` and
+ * `data-vertical:`. Those are not Tailwind built-ins; they come from
+ * `shadcn/tailwind.css`, and a consumer that imported only this file got
+ * dialogs and tooltips with no open or closed styling and nothing to explain
+ * it. Tailwind drops an unknown variant silently, so the failure is invisible.
+ *
+ * Restated here (from shadcn, MIT) so the package is self-contained. Redefining
+ * a custom variant is an override rather than a conflict, so a consumer that
+ * also imports `shadcn/tailwind.css` (upwork-crm does) is unaffected.
+ *
+ * Animation is the one thing still not self-contained: the dialog, sheet and
+ * tooltip carry `animate-in` / `fade-in-0` / `zoom-in-95` / `slide-in-from-*`
+ * from `tw-animate-css`. Without it they open and close with no transition,
+ * which is a cosmetic loss and not a broken component, so the kit does not
+ * vendor a whole animation library for it. Add `@import 'tw-animate-css';` if
+ * you want the motion.
+ */
+@custom-variant data-open (&:where([data-state='open'], [data-open]:not([data-open='false'])));
+@custom-variant data-closed (&:where([data-state='closed'], [data-closed]:not([data-closed='false'])));
+@custom-variant data-active (&:where([data-state='active'], [data-active]:not([data-active='false'])));
+@custom-variant data-horizontal (&:where([data-orientation='horizontal']));
+@custom-variant data-vertical (&:where([data-orientation='vertical']));
+
+/*
  * Tailwind's theme namespaces, every one of them an alias for a `:root` name
  * below. `inline` means a utility inlines the referenced var rather than adding
  * another hop, which is what lets `--primary` be overridden per subtree.

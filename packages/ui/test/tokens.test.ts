@@ -254,3 +254,38 @@ describe('non-Tailwind consumers', () => {
     expect(dangling).toEqual([]);
   });
 });
+
+/**
+ * The second thing a consumer could not have guessed: the compiled primitives
+ * use base-ui state variants Tailwind does not ship. They came from
+ * `shadcn/tailwind.css`, upwork-crm happened to import it, and a consumer that
+ * followed the README literally got dialogs and tooltips with no open or closed
+ * styling. Tailwind drops an unknown variant without a word, so nothing pointed
+ * at the cause.
+ */
+describe('base-ui variants', () => {
+  const defined = new Set([...bare.matchAll(/@custom-variant\s+([\w-]+)/g)].map((m) => m[1]!));
+
+  function sourceFiles(dir: string): string[] {
+    return readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory() ? sourceFiles(join(dir, entry.name)) : [join(dir, entry.name)],
+    );
+  }
+
+  it('defines every data-* variant the primitives use', () => {
+    const used = new Set<string>();
+    for (const file of sourceFiles(join(PACKAGE_DIR, 'src'))) {
+      for (const m of readFileSync(file, 'utf8').matchAll(/\bdata-([a-z]+):/g)) {
+        used.add(`data-${m[1]!}`);
+      }
+    }
+
+    expect(used.size).toBeGreaterThan(0);
+    expect([...used].filter((variant) => !defined.has(variant)).sort()).toEqual([]);
+  });
+
+  it('keeps the dark variant keyed on the attribute, not a class', () => {
+    expect(defined.has('dark')).toBe(true);
+    expect(css).toContain("@custom-variant dark (&:is([data-theme='dark'] *));");
+  });
+});
