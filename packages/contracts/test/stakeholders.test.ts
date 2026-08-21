@@ -1,8 +1,12 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import type { FetchLike } from '../src/peer.js';
 import {
   approvers,
   blockers,
+  contactName,
+  contactRow,
   fetchStakeholders,
   openSeats,
   stakeholdersFor,
@@ -10,8 +14,24 @@ import {
   StakeholderFeedSchema,
 } from '../src/stakeholders.js';
 
-// Shaped exactly like team.alpina.solutions/api/stakeholders.json: the route
-// wraps each client with its contact, open-seat count and rows.
+/**
+ * A real response from the Astro producer, captured by building the site and
+ * reading the prerendered route. Names and addresses are placeholders; the
+ * shape is untouched. See `test/fixtures/README.md`.
+ *
+ * It is here because the hand-written `feed` below was not enough. It was
+ * written from the schema, so it agreed with the schema, and the two of them
+ * agreed on a `contact` shape that no producer has ever sent.
+ */
+const astroFeed: unknown = JSON.parse(
+  readFileSync(
+    fileURLToPath(new URL('./fixtures/stakeholders-astro.json', import.meta.url)),
+    'utf8',
+  ),
+);
+
+// The hub's shape: `contact` is the whole stakeholder row. The Astro host sends
+// a bare name instead, which is what the fixture above holds.
 const feed = {
   generatedAt: '2026-08-20T09:00:00.000Z',
   source: 'team.alpina.solutions/src/data/stakeholders.ts',
@@ -92,7 +112,7 @@ function jsonResponse(body: unknown, status = 200): Response {
 const configured = { baseUrl: 'https://team.alpina.solutions' };
 
 describe('fetchStakeholders', () => {
-  it('parses the live feed shape', async () => {
+  it('parses the hub feed shape', async () => {
     const fetchImpl = vi.fn<FetchLike>().mockResolvedValue(jsonResponse(feed));
     const result = await fetchStakeholders({ ...configured, fetchImpl });
     expect(result.ok).toBe(true);
@@ -146,6 +166,69 @@ describe('fetchStakeholders', () => {
       reason: 'not-configured',
     });
     expect(fetchImpl).not.toHaveBeenCalled();
+  });
+});
+
+describe('the captured Astro response', () => {
+  it('parses, which it did not before: contact is a bare name, not a row', () => {
+    const parsed = StakeholderFeedSchema.safeParse(astroFeed);
+    expect(parsed.success, JSON.stringify(parsed.error?.issues.slice(0, 2))).toBe(true);
+    if (!parsed.success) return;
+
+    // The whole defect in one assertion. `StakeholderClientSchema` typed this
+    // as a full stakeholder row for two releases while every deployed producer
+    // sent a string, so `fetchStakeholders` would have rejected the live feed.
+    expect(parsed.data.clients.map((c) => typeof c.contact)).toEqual(['string', 'string']);
+  });
+
+  it('survives the client, not just the schema', async () => {
+    const fetchImpl = vi.fn<FetchLike>().mockResolvedValue(jsonResponse(astroFeed));
+    const result = await fetchStakeholders({ ...configured, fetchImpl });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.counts.rows).toBe(25);
+      expect(result.data.clients).toHaveLength(2);
+    }
+  });
+
+  it('keeps the parts of the shape that were already right', () => {
+    const parsed = StakeholderFeedSchema.parse(astroFeed);
+    // Empty seats, rows on both sides, inferred reporting lines and the
+    // optional keys that only some rows carry.
+    expect(openSeats(parsed).length).toBe(parsed.counts.openSeats);
+    expect(openSeats(parsed).every((s) => s.openAction !== undefined)).toBe(true);
+    const rows = parsed.clients.flatMap((c) => c.stakeholders);
+    expect(rows).toHaveLength(parsed.counts.rows);
+    expect(rows.some((s) => s.side === 'alpina')).toBe(true);
+    expect(rows.some((s) => s.reportsToAssumed === true)).toBe(true);
+    expect(rows.some((s) => s.market !== undefined)).toBe(true);
+  });
+
+  it('reads the contact name the same way out of either producer', () => {
+    const astro = StakeholderFeedSchema.parse(astroFeed);
+    const hub = StakeholderFeedSchema.parse(feed);
+
+    expect(astro.clients.map(contactName)).toEqual(['Person One', 'Person Thirteen']);
+    expect(hub.clients.map(contactName)).toEqual(['A. Person']);
+
+    // And the difference stays visible where it matters: only the hub can hand
+    // back a row, so a caller wanting the address knows it has to look it up.
+    expect(astro.clients.map(contactRow)).toEqual([null, null]);
+    expect(contactRow(hub.clients[0]!)?.email).toBe('ceo@example.com');
+  });
+
+  it('treats a client with no named contact as null in both forms', () => {
+    const parsed = StakeholderFeedSchema.parse({
+      ...feed,
+      clients: [{ ...feed.clients[0], contact: null }],
+    });
+    expect(contactName(parsed.clients[0]!)).toBeNull();
+    expect(contactRow(parsed.clients[0]!)).toBeNull();
+  });
+
+  it('still refuses a contact that is neither a name nor a row', () => {
+    const broken = { ...feed, clients: [{ ...feed.clients[0], contact: 42 }] };
+    expect(StakeholderFeedSchema.safeParse(broken).success).toBe(false);
   });
 });
 

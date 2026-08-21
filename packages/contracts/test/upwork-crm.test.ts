@@ -7,13 +7,23 @@ import {
   UpworkContractSchema,
 } from '../src/upwork-crm.js';
 
-// One row as upwork-crm's /api/v1/contracts actually returns it: numerics come
-// back as strings from postgres, most columns are nullable.
+/**
+ * One row as upwork-crm's /api/v1/contracts actually returns it. The route
+ * hands `listContracts()` straight to `NextResponse.json`, so this is
+ * `packages/db/src/schema/contracts.ts` serialized: numerics come back as
+ * strings from postgres, the date columns are `text` rather than `date`, and
+ * `createdAt` / `updatedAt` are Dates that JSON turns into ISO strings.
+ *
+ * The last five keys are the ones this schema does not name. They are here so
+ * `passthrough` is proven against the row the producer sends rather than
+ * against a row trimmed to fit the schema, which is how the stakeholder feed
+ * went two releases with a `contact` shape no producer ever sent.
+ */
 const row = {
   id: '6f1c9b8a-0000-4000-8000-000000000001',
   upworkContractId: '1234567890',
   title: 'Payload CMS build',
-  status: 'active',
+  status: 'ACTIVE',
   kind: 'hourly',
   deliveryModel: null,
   clientOrgId: '99',
@@ -25,6 +35,11 @@ const row = {
   currency: 'USD',
   startDate: '2026-03-01',
   endDate: null,
+  accountId: null,
+  leadId: '6f1c9b8a-0000-4000-8000-000000000002',
+  raw: { offer: { id: '42' } },
+  createdAt: '2026-03-01T09:00:00.000Z',
+  updatedAt: '2026-08-14T11:22:33.000Z',
 };
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -58,6 +73,24 @@ describe('fetchContracts', () => {
     const fetchImpl = vi.fn<FetchLike>().mockResolvedValue(jsonResponse([]));
     await fetchContracts({ ...configured, baseUrl: 'https://x/', fetchImpl });
     expect(fetchImpl.mock.calls[0]?.[0]).toBe('https://x/api/v1/contracts');
+  });
+
+  it('keeps the columns the schema does not name', async () => {
+    // `raw`, `leadId`, `accountId` and the timestamps are on every row the
+    // route returns. A consumer that wants one of them gets it; nothing here
+    // strips a column just because this package never listed it.
+    const fetchImpl = vi.fn<FetchLike>().mockResolvedValue(jsonResponse([row]));
+    const result = await fetchContracts({ ...configured, fetchImpl });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data[0]).toMatchObject({
+        leadId: row.leadId,
+        accountId: null,
+        raw: { offer: { id: '42' } },
+        createdAt: '2026-03-01T09:00:00.000Z',
+        updatedAt: '2026-08-14T11:22:33.000Z',
+      });
+    }
   });
 
   it('tolerates new columns, because upwork-crm adds them often', async () => {

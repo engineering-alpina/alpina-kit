@@ -284,6 +284,13 @@ The registry here is current. The `sso` row reads
 `"status": "live (fleet login since 2026-08-18)"`, so the note that used to
 stand here about a stale row travelling with the copy no longer applies.
 
+`hub` is in it as of v0.3.0, at `"status": "planned"`. alpina-hub is built and
+not deployed, and the shell's `serviceId="hub"` had nothing to match, so the hub
+was linking to itself and no peer could link to it. The status stays `planned`
+until `hub.alpina-tech.org` answers: `navigableServices()` filters on a status
+starting with `live`, and every sidebar in the fleet renders from that list
+without checking, so an early `live` is a dead link in all of them.
+
 ## Working in this repo
 
 ```sh

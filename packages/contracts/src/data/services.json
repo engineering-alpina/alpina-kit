@@ -116,6 +116,20 @@
       "status": "local-tool"
     },
     {
+      "id": "hub",
+      "name": "Alpina Hub",
+      "domain": "hub.alpina-tech.org",
+      "repo": "alpina/ALPINA-TECH/PRODUCT/alpina-hub",
+      "devPort": 4421,
+      "db": "hub schema (Hetzner data layer)",
+      "deploy": "Coolify alpina-internal (Hetzner VM 101)",
+      "health": "/api/health",
+      "api": null,
+      "mcp": [],
+      "status": "planned",
+      "auth": "Zitadel SSO, local users table with admin/member roles"
+    },
+    {
       "id": "invoicing",
       "name": "Invoicing",
       "domain": "invoicing.alpina.solutions",

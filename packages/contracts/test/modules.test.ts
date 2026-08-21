@@ -38,6 +38,29 @@ describe('module list', () => {
     expect(ids).not.toContain('portal');
   });
 
+  it('keeps a planned service out of the menu until its host answers', () => {
+    // The hub has a row, a domain and an icon, and it is not deployed. A
+    // premature `"status": "live"` would put a dead link in the sidebar of
+    // every other service at once, because they all render from this list and
+    // none of them fetches to find out. `navigableServices()` is the only gate.
+    const hub = services.find((s) => s.id === 'hub');
+    expect(hub?.domain).toBe('hub.alpina-tech.org');
+    expect(hub?.status).toBe('planned');
+    expect(navigableServices().some((s) => s.id === 'hub')).toBe(false);
+    expect(moduleServices().some((s) => s.id === 'hub')).toBe(false);
+  });
+
+  it('drops every service whose status does not start with live', () => {
+    const notLive = services.filter((s) => !s.status.startsWith('live')).map((s) => s.id);
+    expect(notLive).toContain('hub');
+    for (const id of notLive) {
+      expect(
+        moduleServices().some((s) => s.id === id),
+        id,
+      ).toBe(false);
+    }
+  });
+
   it('lists only live hosted services', () => {
     for (const service of moduleServices()) {
       expect(service.domain).not.toBeNull();
@@ -60,6 +83,11 @@ describe('icon names', () => {
     for (const service of moduleServices()) {
       expect(SERVICE_ICON_NAMES[service.id], service.id).toBeDefined();
     }
+  });
+
+  it('names an icon for a planned service too, so going live needs no second edit', () => {
+    expect(serviceIconName('hub')).toBe('building-2');
+    expect(serviceIconName('hub')).not.toBe(FALLBACK_SERVICE_ICON_NAME);
   });
 
   it('falls back to a neutral mark rather than guessing', () => {

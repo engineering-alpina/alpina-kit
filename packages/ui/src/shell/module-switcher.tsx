@@ -9,6 +9,7 @@ import {
   type ModuleServicesOptions,
 } from '@alpina/contracts';
 import {
+  Building2Icon,
   ContactIcon,
   ExternalLinkIcon,
   FileTextIcon,
@@ -64,6 +65,7 @@ const ICONS_BY_NAME: Record<string, React.ComponentType<{ className?: string }>>
   timer: TimerIcon,
   table: TableIcon,
   'key-round': KeyRoundIcon,
+  'building-2': Building2Icon,
   [FALLBACK_SERVICE_ICON_NAME]: SquareIcon,
 };
 
