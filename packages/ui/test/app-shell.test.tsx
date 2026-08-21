@@ -60,6 +60,20 @@ describe('<AppShell>', () => {
     }
   });
 
+  /**
+   * upwork-crm reported this as "I had to stop using AppShell": the topbar took
+   * no className, so the viewer lost the `sticky top-6` that cleared its HudBar.
+   */
+  it('lets the app style the topbar', () => {
+    const { container } = renderShell({ topbarClassName: 'sticky top-6' });
+    const bar = container.querySelector('[data-slot="shell-topbar"]');
+
+    expect(bar?.className).toContain('sticky');
+    expect(bar?.className).toContain('top-6');
+    // The shell's own bar classes survive the addition.
+    expect(bar?.className).toContain('border-b');
+  });
+
   it('has no session-dependent behaviour of its own', () => {
     // The fleet rule is that an app decides whether a shell renders at all, so
     // the shell must not consult anything that could carry a session. It gets no

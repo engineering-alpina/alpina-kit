@@ -69,6 +69,12 @@ export interface AppShellProps {
   renderLink?: LinkRenderer;
   /** Contents of the sticky topbar, to the right of the sidebar toggle. */
   topbar?: React.ReactNode;
+  /**
+   * Applied to the `<header>`, so an app can offset or restyle the bar without
+   * rebuilding the shell. upwork-crm needs `sticky top-6` to clear its HudBar,
+   * and in v0.1.0 the only way to get it was to stop using `AppShell`.
+   */
+  topbarClassName?: string;
   /** Extra registry ids to keep out of the module block. */
   excludeServices?: readonly string[];
   /** Label above the module block. Defaults to "Alpina ERP". */
@@ -81,6 +87,7 @@ export interface AppShellProps {
 }
 
 const defaultRenderLink: LinkRenderer = (href) => <a href={href} />;
+
 
 function Brand({ brand, renderLink }: { brand: ShellBrand; renderLink: LinkRenderer }) {
   const inner = (
@@ -126,12 +133,52 @@ export function AppShell({
   pathname,
   renderLink = defaultRenderLink,
   topbar,
+  topbarClassName,
   excludeServices,
   moduleGroupLabel,
   sidebarFooter,
   contentClassName,
   children,
 }: AppShellProps) {
+  const groupNodes = groups.map((group) => (
+    <SidebarGroup key={group.label}>
+      <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {group.items.map((item) => {
+            const Icon = item.icon;
+            return (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  isActive={isActive(pathname, item.href, item.exactOnlyPrefixes ?? [])}
+                  tooltip={item.label}
+                  render={renderLink(item.href)}
+                >
+                  {Icon ? <Icon /> : null}
+                  <span>{item.label}</span>
+                  {item.shortcut && (
+                    <kbd className="ml-auto hidden rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] group-data-[collapsible=icon]:hidden md:inline-flex">
+                      {item.shortcut}
+                    </kbd>
+                  )}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  ));
+
+  groupNodes.push(
+    <ModuleSwitcher
+      key="alpina-erp-modules"
+      currentServiceId={serviceId}
+      exclude={excludeServices}
+      {...(moduleGroupLabel === undefined ? {} : { label: moduleGroupLabel })}
+    />,
+  );
+
   return (
     <TooltipProvider>
       <SidebarProvider>
@@ -140,43 +187,7 @@ export function AppShell({
             <Brand brand={brand} renderLink={renderLink} />
           </SidebarHeader>
 
-          <SidebarContent>
-            {groups.map((group) => (
-              <SidebarGroup key={group.label}>
-                <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {group.items.map((item) => {
-                      const Icon = item.icon;
-                      return (
-                        <SidebarMenuItem key={item.href}>
-                          <SidebarMenuButton
-                            isActive={isActive(pathname, item.href, item.exactOnlyPrefixes ?? [])}
-                            tooltip={item.label}
-                            render={renderLink(item.href)}
-                          >
-                            {Icon ? <Icon /> : null}
-                            <span>{item.label}</span>
-                            {item.shortcut && (
-                              <kbd className="ml-auto hidden rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] group-data-[collapsible=icon]:hidden md:inline-flex">
-                                {item.shortcut}
-                              </kbd>
-                            )}
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      );
-                    })}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            ))}
-
-            <ModuleSwitcher
-              currentServiceId={serviceId}
-              exclude={excludeServices}
-              {...(moduleGroupLabel === undefined ? {} : { label: moduleGroupLabel })}
-            />
-          </SidebarContent>
+          <SidebarContent>{groupNodes}</SidebarContent>
 
           {sidebarFooter && (
             <SidebarFooter>
@@ -187,7 +198,7 @@ export function AppShell({
         </Sidebar>
 
         <SidebarInset>
-          <ShellTopbar>{topbar}</ShellTopbar>
+          <ShellTopbar className={topbarClassName}>{topbar}</ShellTopbar>
           <main className={cn('flex-1 px-4 py-6 md:px-8', contentClassName)}>
             <div className="mx-auto w-full max-w-[1500px]">{children}</div>
           </main>
@@ -205,7 +216,9 @@ export function ShellTopbar({
   className,
   children,
 }: {
-  className?: string;
+  // `| undefined` explicitly, because exactOptionalPropertyTypes is on and
+  // AppShell forwards its own optional prop straight through.
+  className?: string | undefined;
   children?: React.ReactNode;
 }) {
   return (
