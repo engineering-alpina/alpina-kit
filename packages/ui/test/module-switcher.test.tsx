@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { moduleServices, serviceIconName, services } from '@alpina/contracts';
+import { moduleServices, serviceIconName, serviceLabel, services } from '@alpina/contracts';
 
 import { ModuleSwitcher, serviceIcon } from '../src/shell/module-switcher.js';
 import { SidebarProvider } from '../src/ui/sidebar.js';
@@ -9,8 +9,8 @@ import { TooltipProvider } from '../src/ui/tooltip.js';
 /**
  * Which services belong in the menu is `@alpina/contracts`' problem now, and
  * `test/modules.test.ts` over there covers it. What is left here is rendering:
- * the icon name becomes a component and the group draws one external link per
- * module.
+ * the icon name becomes a component, the label comes out short, and the group
+ * draws one external link per module.
  */
 
 function renderSwitcher(props: React.ComponentProps<typeof ModuleSwitcher> = {}) {
@@ -50,13 +50,27 @@ describe('<ModuleSwitcher>', () => {
 
     const expected = moduleServices();
     for (const service of expected) {
-      const link = screen.getByText(service.name).closest('a');
+      const link = screen.getByText(serviceLabel(service)).closest('a');
       expect(link, `no link rendered for ${service.id}`).not.toBeNull();
       expect(link!.getAttribute('href')).toBe(`https://${service.domain}`);
       expect(link!.getAttribute('target')).toBe('_blank');
       expect(link!.getAttribute('rel')).toBe('noopener noreferrer');
     }
     expect(screen.getAllByRole('link')).toHaveLength(expected.length);
+  });
+
+  it('prints the short name, not the registry name with its deployment suffix', () => {
+    renderSwitcher();
+
+    // "Time tracking (Kimai, vendor)" is how FLEET.md describes the row. A
+    // sidebar entry wraps to two lines on it, so the switcher reads shortName.
+    expect(screen.getByText('Time tracking')).toBeDefined();
+    expect(screen.queryByText('Time tracking (Kimai, vendor)')).toBeNull();
+    expect(screen.queryByText('Twenty CRM (vendor)')).toBeNull();
+
+    for (const link of screen.getAllByRole('link')) {
+      expect(link.textContent ?? '').not.toContain('(vendor)');
+    }
   });
 
   it('never renders a service the registry does not call navigable', () => {

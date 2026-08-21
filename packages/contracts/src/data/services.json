@@ -1,6 +1,6 @@
 {
   "$comment": "Alpina fleet service registry. Canonical home moves to alpina-kit (Phase 1 of docs/superpowers/specs/2026-08-13-fleet-modularity-architecture-design.md). Keep FLEET.md in sync.",
-  "updated": "2026-08-18",
+  "updated": "2026-08-21",
   "services": [
     {
       "id": "upwork-crm",
@@ -75,6 +75,7 @@
     {
       "id": "time",
       "name": "Time tracking (Kimai, vendor)",
+      "shortName": "Time tracking",
       "domain": "time.alpina.solutions",
       "repo": "vendor",
       "devPort": null,
@@ -89,6 +90,7 @@
     {
       "id": "sso",
       "name": "Zitadel IdP (vendor)",
+      "shortName": "Zitadel",
       "domain": "auth.alpina-tech.org",
       "repo": "vendor; Hetzner LXC 112; homelab twin auth.antonyuk.org",
       "devPort": null,
@@ -130,6 +132,7 @@
     {
       "id": "twenty",
       "name": "Twenty CRM (vendor)",
+      "shortName": "Twenty CRM",
       "domain": "twenty.alpina-tech.org",
       "repo": "vendor app on Hetzner; synced from upwork-crm scripts/sync-twenty.ts",
       "devPort": null,

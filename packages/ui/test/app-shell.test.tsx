@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 
 import { AppShell } from '../src/shell/app-shell.js';
 import { isActive, type NavGroup } from '../src/shell/nav.js';
-import { moduleServices } from '@alpina/contracts';
+import { moduleServices, serviceLabel } from '@alpina/contracts';
 
 const groups: NavGroup[] = [
   {
@@ -56,7 +56,7 @@ describe('<AppShell>', () => {
     const modules = moduleServices({ currentServiceId: 'upwork-crm' });
     expect(modules.length).toBeGreaterThan(0);
     for (const service of modules) {
-      expect(within(block as HTMLElement).getByText(service.name)).toBeDefined();
+      expect(within(block as HTMLElement).getByText(serviceLabel(service))).toBeDefined();
     }
   });
 

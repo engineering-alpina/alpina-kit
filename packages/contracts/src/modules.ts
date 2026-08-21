@@ -50,6 +50,20 @@ export function serviceIconName(id: string): string {
   return SERVICE_ICON_NAMES[id] ?? FALLBACK_SERVICE_ICON_NAME;
 }
 
+/**
+ * What to print in a menu. `shortName` when the row carries one, `name`
+ * otherwise.
+ *
+ * Registry names describe a service in a table of services, so several carry
+ * deployment metadata: "Time tracking (Kimai, vendor)" wraps to two lines in a
+ * sidebar and "Twenty CRM (vendor)" reads like a bug report. Every consumer
+ * calls this rather than trimming the string itself, so the fleet cannot end up
+ * with three slightly different ways of dropping a suffix.
+ */
+export function serviceLabel(service: Pick<Service, 'name' | 'shortName'>): string {
+  return service.shortName ?? service.name;
+}
+
 export interface ModuleServicesOptions {
   /** The registry id of the service doing the rendering. It links to itself otherwise. */
   currentServiceId?: string | undefined;

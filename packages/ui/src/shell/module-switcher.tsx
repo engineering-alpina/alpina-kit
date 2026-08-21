@@ -5,6 +5,7 @@ import {
   FALLBACK_SERVICE_ICON_NAME,
   moduleServices,
   serviceIconName,
+  serviceLabel,
   type ModuleServicesOptions,
 } from '@alpina/contracts';
 import {
@@ -91,7 +92,10 @@ export function ModuleSwitcher({
         <SidebarMenu>
           {modules.map((service) => {
             const Icon = serviceIcon(service.id);
-            const title = service.name;
+            // shortName when the row has one: the registry's `name` describes a
+            // service in a table of services, so several carry a "(vendor)"
+            // suffix that wraps to two lines in a sidebar.
+            const title = serviceLabel(service);
             return (
               <SidebarMenuItem key={service.id}>
                 <SidebarMenuButton

@@ -5,8 +5,9 @@ import {
   NON_MODULE_SERVICE_IDS,
   SERVICE_ICON_NAMES,
   serviceIconName,
+  serviceLabel,
 } from '../src/modules.js';
-import { navigableServices } from '../src/registry.js';
+import { navigableServices, services } from '../src/registry.js';
 
 /**
  * These moved out of `@alpina/ui` because alpina-recruiting could not import
@@ -64,5 +65,30 @@ describe('icon names', () => {
   it('falls back to a neutral mark rather than guessing', () => {
     expect(serviceIconName('upwork-crm')).toBe('layout-dashboard');
     expect(serviceIconName('not-a-service')).toBe(FALLBACK_SERVICE_ICON_NAME);
+  });
+});
+
+describe('menu labels', () => {
+  it('prefers shortName so a sidebar entry does not wrap', () => {
+    expect(
+      serviceLabel({ name: 'Time tracking (Kimai, vendor)', shortName: 'Time tracking' }),
+    ).toBe('Time tracking');
+  });
+
+  it('falls back to the registry name when there is no shortName', () => {
+    expect(serviceLabel({ name: 'Invoicing' })).toBe('Invoicing');
+  });
+
+  it('gives every deployment-metadata name a short form', () => {
+    // "(vendor)" and friends say how a thing is run, which belongs in FLEET.md
+    // and not in a menu item.
+    const unfixed = services.filter((s) => /\(/.test(serviceLabel(s)));
+    expect(unfixed.map((s) => s.id)).toEqual([]);
+  });
+
+  it('keeps every menu label short enough for a sidebar', () => {
+    for (const service of moduleServices()) {
+      expect(serviceLabel(service).length, service.id).toBeLessThanOrEqual(20);
+    }
   });
 });

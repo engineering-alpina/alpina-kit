@@ -72,6 +72,7 @@ export {
   SERVICE_ICON_NAMES,
   FALLBACK_SERVICE_ICON_NAME,
   serviceIconName,
+  serviceLabel,
   moduleServices,
   type ModuleServicesOptions,
 } from './modules.js';

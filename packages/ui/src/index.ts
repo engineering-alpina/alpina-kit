@@ -31,6 +31,7 @@ export { ModuleSwitcher, serviceIcon, type ModuleSwitcherProps } from './shell/m
 export {
   moduleServices,
   serviceIconName,
+  serviceLabel,
   NON_MODULE_SERVICE_IDS,
   SERVICE_ICON_NAMES,
   FALLBACK_SERVICE_ICON_NAME,
