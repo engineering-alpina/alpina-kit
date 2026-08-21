@@ -1,6 +1,6 @@
 {
   "name": "@alpina/service-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shared service primitives for the Alpina fleet: db client, safe compare, cookies, env parsing, health handler, kill switch.",
   "license": "UNLICENSED",
   "type": "module",

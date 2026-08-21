@@ -1,6 +1,6 @@
 {
   "name": "@alpina/auth",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Fleet authentication: Zitadel OIDC code+PKCE client, session cookie helpers, hashed bearer-key role verifier. Authn only, never authorization policy.",
   "license": "UNLICENSED",
   "type": "module",
