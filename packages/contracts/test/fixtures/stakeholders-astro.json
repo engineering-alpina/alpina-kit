@@ -1,0 +1,477 @@
+{
+  "generatedAt": "2026-08-21T16:33:43.422Z",
+  "source": "team.alpina.solutions/src/data/stakeholders.ts",
+  "counts": {
+    "clients": 2,
+    "rows": 25,
+    "openSeats": 8
+  },
+  "clients": [
+    {
+      "id": "client-one",
+      "name": "Client One",
+      "contact": "Person One",
+      "openSeats": 5,
+      "stakeholders": [
+        {
+          "id": "client-one-row-1",
+          "clientId": "client-one",
+          "side": "client",
+          "role": "CEO, головний контакт",
+          "person": "Person One",
+          "email": "person-one@example.com",
+          "cares": "Комерційний результат, органічна видимість і те, щоб сайт не зламався",
+          "powers": [
+            "approves",
+            "blocks"
+          ],
+          "scope": "Обсяг, бюджет, пріоритети, запити на доступи, будь-яка ескалація",
+          "cadence": "Щотижневий письмовий статус, місячний огляд, ескалації того ж дня",
+          "source": "Client One/reviews/process-stakeholders.md, 4 серп. 2026 · адреса зі списку контактів клієнта, 10 серп. 2026",
+          "note": "Єдина точка входу майже для всього. Це записано як ризик R5: рутинні питання стоять у черзі за CEO."
+        },
+        {
+          "id": "client-one-row-2",
+          "reportsTo": "client-one-row-1",
+          "reportsToAssumed": true,
+          "clientId": "client-one",
+          "side": "client",
+          "role": "Власник CMS і доступів, технічні питання",
+          "person": "Person Two",
+          "email": "person-two@example.com",
+          "cares": "Цілісність CMS і те, щоб редакторам контенту не заважали",
+          "powers": [
+            "approves",
+            "blocks"
+          ],
+          "scope": "Доступи до Sanity і CMS, зміни на боці CMS, час ротації секретів",
+          "cadence": "На запит, плюс копія щотижневого статусу",
+          "source": "Client One/reviews/process-stakeholders.md, 4 серп. 2026 · адреса зі списку контактів клієнта, 10 серп. 2026"
+        },
+        {
+          "id": "client-one-row-3",
+          "reportsTo": "client-one-row-1",
+          "clientId": "client-one",
+          "side": "client",
+          "role": "Head of marketing, фінальний апрув на контент",
+          "person": "Person Three",
+          "email": null,
+          "cares": "Трафік, позиції, кампанійні сторінки, узгодженість меседжу по ринках",
+          "powers": [
+            "approves",
+            "blocks"
+          ],
+          "scope": "Контент і мета-копірайт, пріоритети сторінок",
+          "cadence": "Копія щотижневого статусу, присутня на місячному огляді",
+          "openAction": "A1: Дан має формально закріпити її власником контенту і мета-копірайту та дати адресу. Поки що імʼя є, ролі формально немає.",
+          "source": "Client One/reviews/process-stakeholders.md, 4 серп. 2026 · імʼя зі списку контактів клієнта, 10 серп. 2026"
+        },
+        {
+          "id": "client-one-row-4",
+          "reportsTo": "client-one-row-1",
+          "reportsToAssumed": true,
+          "clientId": "client-one",
+          "side": "client",
+          "role": "CTO",
+          "person": "Person Four",
+          "email": "person-three@example.com",
+          "cares": "Стан кодової бази і технічні рішення",
+          "powers": [],
+          "scope": "Не визначено",
+          "cadence": "Поки не пишемо напряму",
+          "source": "Список контактів клієнта, 10 серп. 2026",
+          "note": "У погодженому процесі змін його немає. Або він і є той інженер, якого просимо назвати в A2, або поруч з ним стоїть хтось інший. Питання відкрите."
+        },
+        {
+          "id": "client-one-row-5",
+          "reportsTo": "client-one-row-1",
+          "reportsToAssumed": true,
+          "clientId": "client-one",
+          "side": "client",
+          "role": "Broker dealer",
+          "person": "Person Five",
+          "email": "person-four@example.com",
+          "cares": "Що бачить відвідувач у його юрисдикції",
+          "powers": [
+            "consulted"
+          ],
+          "scope": "Зміни, видимі на канадському ринку",
+          "cadence": "Поки не пишемо напряму",
+          "market": "Канада",
+          "source": "Список контактів клієнта, 10 серп. 2026",
+          "note": "«Питаємо до» це наш висновок з того, що він власник ринку, а не узгоджена роль. Підтвердити разом з A4."
+        },
+        {
+          "id": "client-one-row-6",
+          "reportsTo": "client-one-row-1",
+          "reportsToAssumed": true,
+          "clientId": "client-one",
+          "side": "client",
+          "role": "Broker dealer",
+          "person": "Person Six",
+          "email": "person-five@example.com",
+          "cares": "Що бачить відвідувач у його юрисдикції",
+          "powers": [
+            "consulted"
+          ],
+          "scope": "Зміни, видимі на ринку США",
+          "cadence": "Поки не пишемо напряму",
+          "market": "США",
+          "source": "Список контактів клієнта, 10 серп. 2026",
+          "note": "«Питаємо до» це наш висновок з того, що він власник ринку, а не узгоджена роль. Підтвердити разом з A4."
+        },
+        {
+          "id": "client-one-row-7",
+          "reportsTo": "client-one-row-1",
+          "reportsToAssumed": true,
+          "clientId": "client-one",
+          "side": "client",
+          "role": "Broker dealer",
+          "person": "Person Seven",
+          "email": "person-six@example.com",
+          "cares": "Що бачить відвідувач у його юрисдикції",
+          "powers": [
+            "consulted"
+          ],
+          "scope": "Зміни, видимі на ринку ЄС, сім локалей",
+          "cadence": "Поки не пишемо напряму",
+          "market": "ЄС",
+          "source": "Список контактів клієнта, 10 серп. 2026",
+          "note": "Сім локалей ЄС це найбільший блок ризику по комплаєнсу і водночас найменш виміряний трафік. Підтвердити разом з A4 і A7."
+        },
+        {
+          "id": "client-one-row-8",
+          "reportsTo": "client-one-row-1",
+          "reportsToAssumed": true,
+          "clientId": "client-one",
+          "side": "client",
+          "role": "Broker dealer",
+          "person": "Person Eight",
+          "email": "person-seven@example.com",
+          "cares": "Що бачить відвідувач у його юрисдикції",
+          "powers": [
+            "consulted"
+          ],
+          "scope": "Зміни, видимі на багамському ринку",
+          "cadence": "Поки не пишемо напряму",
+          "market": "Багами",
+          "source": "Список контактів клієнта, 10 серп. 2026",
+          "note": "«Питаємо до» це наш висновок з того, що він власник ринку, а не узгоджена роль. Підтвердити разом з A4."
+        },
+        {
+          "id": "client-one-row-9",
+          "reportsTo": "client-one-row-1",
+          "reportsToAssumed": true,
+          "clientId": "client-one",
+          "side": "client",
+          "role": "Payroll і HR, тільки адміністративні питання",
+          "person": "Person Nine",
+          "email": "person-eight@example.com",
+          "cares": "Адміністративна частина стосунків",
+          "powers": [
+            "informed"
+          ],
+          "scope": "До змін на сайті стосунку не має",
+          "cadence": "Тільки коли пише сама",
+          "source": "Список контактів клієнта, 10 серп. 2026",
+          "note": "У реєстрі, щоб не витрачати час на здогадки, коли лист приходить від незнайомої адреси."
+        },
+        {
+          "id": "client-one-row-10",
+          "reportsTo": "client-one-row-1",
+          "reportsToAssumed": true,
+          "clientId": "client-one",
+          "side": "client",
+          "role": "Продакт-менеджер, робочий рівень",
+          "person": "Person Ten",
+          "email": null,
+          "cares": "Щоб робота рухалась і не впиралась щоразу в CEO",
+          "powers": [
+            "consulted",
+            "informed"
+          ],
+          "scope": "Щоденна координація: що беремо далі, що чекає, кого підключити",
+          "cadence": "Прямий канал з Elevenм, без розкладу",
+          "openAction": "Дізнатись прізвище, пошту і чи він може ухвалювати щось сам, чи тільки передає Дану. Без цього незрозуміло, чи він закриває рівень 0 ескалації, чи просто перекладає.",
+          "source": "Від Дмитра, 10 серп. 2026",
+          "note": "Єдиний робочий канал повз CEO, який у нас сьогодні є. Прямо бʼє в ризик R5, де все стоїть у черзі за Даном. Місце в структурі це здогад: під ким він сидить, ми не знаємо."
+        },
+        {
+          "id": "client-one-row-11",
+          "reportsTo": "client-one-row-4",
+          "reportsToAssumed": true,
+          "clientId": "client-one",
+          "side": "client",
+          "role": "Інженер репозиторію `home`, який відкриває наші merge request",
+          "person": null,
+          "email": null,
+          "cares": "Якість коду, безпека релізу, щоб наші гілки не створювали їм роботи",
+          "powers": [
+            "approves",
+            "blocks"
+          ],
+          "scope": "Мердж наших змін у їхній `dev`. Фактично будь-яка зміна коду.",
+          "cadence": "Щотижневий технічний синк, щойно зʼявиться імʼя",
+          "openAction": "A2: Дан має назвати одного інженера і погоджений час на рев'ю. Найвищий пріоритет. Наша роль у GitLab це Developer (30), у захищені гілки ми не пишемо, тому без цієї людини перевірені правки просто старіють на наших гілках.",
+          "source": "Client One/reviews/process-stakeholders.md, 4 серп. 2026"
+        },
+        {
+          "id": "client-one-row-12",
+          "reportsTo": "client-one-row-4",
+          "reportsToAssumed": true,
+          "clientId": "client-one",
+          "side": "client",
+          "role": "DevOps команда",
+          "person": null,
+          "email": null,
+          "cares": "Стабільність пайплайна, деплої в Azure, Akamai, секрети",
+          "powers": [
+            "approves",
+            "blocks"
+          ],
+          "scope": "Вікна деплою, зміни в пайплайні, будь-який реліз на прод",
+          "cadence": "Дзвінок на кожну передачу батча, щойно нас познайомлять",
+          "openAction": "A3: Дан має познайомити, далі коротка розмова про те, як прод збирається насправді. Найвищий пріоритет: sitemap генерується скриптом усередині `yarn build`, і якщо пайплайн викликає `next build`, половина SEO-роботи до прода не доїжджає.",
+          "source": "Client One/reviews/process-stakeholders.md, 4 серп. 2026"
+        },
+        {
+          "id": "client-one-row-13",
+          "reportsTo": "client-one-row-1",
+          "reportsToAssumed": true,
+          "clientId": "client-one",
+          "side": "client",
+          "role": "Комплаєнс, підпис під ринково видимими змінами",
+          "person": null,
+          "email": null,
+          "cares": "Щоб кожен ринок бачив рівно те, що йому дозволено бачити",
+          "powers": [
+            "approves",
+            "blocks"
+          ],
+          "scope": "Локалі, дисклеймери, роутинг, будь-яка ринково видима зміна",
+          "cadence": "Запит на підпис під кожен батч, що торкається ринкового виводу",
+          "openAction": "A4: Дан має назвати людину або команду. Поки імені немає, ринково видимі правки стоять на dev-стенді, а їдуть тільки ринково нейтральні.",
+          "source": "Client One/reviews/process-stakeholders.md, 4 серп. 2026",
+          "note": "Єдине повноваження, яке не заміщується нічим: у регульованому брокері CEO не підписує замість комплаєнсу."
+        },
+        {
+          "id": "client-one-row-14",
+          "reportsTo": "client-one-row-2",
+          "clientId": "client-one",
+          "side": "client",
+          "role": "Редактори контенту в Sanity",
+          "person": null,
+          "email": null,
+          "cares": "Щоб CMS працювала і щоб їхні правки зʼявлялися на сайті",
+          "powers": [
+            "informed"
+          ],
+          "scope": "Формально нічого. На практиці можуть переписати наші мета-правки наступним редагуванням.",
+          "cadence": "Письмова нотатка, коли правка чіпає те, що вони редагують",
+          "openAction": "A5: Person Two має сказати, хто саме редагує контент.",
+          "source": "Client One/reviews/process-stakeholders.md, 4 серп. 2026"
+        },
+        {
+          "id": "client-one-row-15",
+          "clientId": "client-one",
+          "side": "alpina",
+          "role": "Делівері і процес",
+          "person": "Person Eleven",
+          "email": "person-nine@example.com",
+          "cares": "Щоб знайдене в аудиті доїхало до прода, а не лишилось у звіті",
+          "powers": [
+            "approves"
+          ],
+          "scope": "Обсяг з нашого боку, стенди Alpina, зміст звіту, ескалації",
+          "cadence": "Веде щотижневий статус і місячний огляд. Щоденно спілкується з Person Tenом, продакт-менеджером клієнта",
+          "source": "Client One/reviews/process-stakeholders.md, 4 серп. 2026",
+          "note": "Робочий канал з клієнтом іде через Person Tenа, а не через Дана. Це єдина пара, яка сьогодні розмовляє щодня."
+        },
+        {
+          "id": "client-one-row-16",
+          "reportsTo": "client-one-row-15",
+          "clientId": "client-one",
+          "side": "alpina",
+          "role": "Технічний SEO і інженер сайту",
+          "person": "Person Eleven",
+          "email": "person-nine@example.com",
+          "cares": "Знахідки, правки на наших гілках, перевірка на стендах",
+          "powers": [
+            "consulted"
+          ],
+          "scope": "Як саме правка зроблена в коді, у межах узгоджених правил",
+          "cadence": "Говорить на технічному синку",
+          "source": "Client One/reviews/process-stakeholders.md, 4 серп. 2026",
+          "note": "Сьогодні це та сама людина, що й делівері-лід. Другий інженер додається, якщо батчі виростуть."
+        },
+        {
+          "id": "client-one-row-17",
+          "reportsTo": "client-one-row-15",
+          "reportsToAssumed": true,
+          "clientId": "client-one",
+          "side": "alpina",
+          "role": "Інфраструктура стендів",
+          "person": "Person Twelve",
+          "email": null,
+          "cares": "Спільний хост Alpina на Hetzner, тунелі, basic auth, TLS",
+          "powers": [
+            "consulted"
+          ],
+          "scope": "Dev і UAT стенди Alpina",
+          "cadence": "Тільки коли задіяний стенд",
+          "source": "Client One/reviews/process-stakeholders.md, 4 серп. 2026"
+        },
+        {
+          "id": "client-one-row-18",
+          "reportsTo": "client-one-row-15",
+          "clientId": "client-one",
+          "side": "alpina",
+          "role": "Другий рецензент наших merge request",
+          "person": null,
+          "email": null,
+          "cares": "Щоб до клієнта не йшло нічого, що бачила одна пара очей",
+          "powers": [
+            "approves"
+          ],
+          "scope": "Код-рев'ю до того, як робота пропонується клієнту",
+          "cadence": "Не клієнтський",
+          "openAction": "A6: наш власний борг, не клієнтський. Поки рецензента немає, батчі позначаються в change note як самоперевірені.",
+          "source": "Client One/reviews/process-stakeholders.md, 4 серп. 2026"
+        }
+      ]
+    },
+    {
+      "id": "client-two",
+      "name": "Client Two",
+      "contact": "Person Thirteen",
+      "openSeats": 3,
+      "stakeholders": [
+        {
+          "id": "client-two-row-19",
+          "reportsTo": "client-two-row-20",
+          "reportsToAssumed": true,
+          "clientId": "client-two",
+          "side": "client",
+          "role": "Незалежна радниця, єдиний канал до кінцевого клієнта",
+          "person": "Person Thirteen",
+          "email": null,
+          "cares": "Довіра кінцевого клієнта і власна репутація радниці",
+          "powers": [
+            "approves",
+            "blocks"
+          ],
+          "scope": "Усе. До кінцевого клієнта нічого не йде повз неї.",
+          "cadence": "Щотижневий дзвінок плюс листування між ними",
+          "source": "client-two/CLAUDE.md і STATE.md, станом на 30 лип. 2026",
+          "note": "Вона контакт, а не кінцевий клієнт. Назви кінцевого клієнта в цьому реєстрі немає свідомо: вона просила не називати його нікому."
+        },
+        {
+          "id": "client-two-row-20",
+          "reportsTo": "client-two-row-21",
+          "clientId": "client-two",
+          "side": "client",
+          "role": "Президент, особа, що ухвалює рішення",
+          "person": "Person Fourteen",
+          "email": null,
+          "cares": "Швидкий видимий результат без навантаження на ручне введення даних",
+          "powers": [
+            "approves",
+            "blocks"
+          ],
+          "scope": "Бюджет і рішення про старт",
+          "cadence": "Тільки через Client Two",
+          "source": "client-two/STATE.md, станом на 30 лип. 2026",
+          "note": "Відкрите заперечення: «виглядає надто добре, щоб бути правдою». Знімається вузьким PoC на реальних публічних даних, а не широким дашбордом."
+        },
+        {
+          "id": "client-two-row-21",
+          "clientId": "client-two",
+          "side": "client",
+          "role": "CEO, батько президента",
+          "person": null,
+          "email": null,
+          "cares": "Щоб компанія не зламала те, що працює пʼятдесят років",
+          "powers": [
+            "approves",
+            "blocks"
+          ],
+          "scope": "Рішення ухвалює разом з президентом",
+          "cadence": "Тільки через Client Two",
+          "openAction": "Спитати в Client Two імʼя. Рішення ухвалюють удвох, тому один з двох підписантів у нас безіменний.",
+          "source": "client-two/STATE.md, станом на 30 лип. 2026"
+        },
+        {
+          "id": "client-two-row-22",
+          "reportsTo": "client-two-row-20",
+          "reportsToAssumed": true,
+          "clientId": "client-two",
+          "side": "client",
+          "role": "COO або GM Ops",
+          "person": null,
+          "email": null,
+          "cares": "Щоб зміни не додали людям ручної роботи",
+          "powers": [
+            "consulted"
+          ],
+          "scope": "Операційна частина: закупівлі, склад, магазини",
+          "cadence": "Поки через Client Two",
+          "openAction": "Client Two мала надіслати імена керівників департаментів разом з їхнім ритмом звітності: щодня, щотижня, щомісяця. Це вже в неї в роботі.",
+          "source": "client-two/STATE.md, станом на 30 лип. 2026",
+          "note": "Чемпіон на боці клієнта."
+        },
+        {
+          "id": "client-two-row-23",
+          "reportsTo": "client-two-row-20",
+          "reportsToAssumed": true,
+          "clientId": "client-two",
+          "side": "client",
+          "role": "Керівник дизайну",
+          "person": null,
+          "email": null,
+          "cares": "Щоб нове виглядало як їхнє, а не як чужа система згори",
+          "powers": [
+            "consulted"
+          ],
+          "scope": "Вигляд і подача того, що бачить персонал магазинів",
+          "cadence": "Поки через Client Two",
+          "openAction": "Те саме імʼя чекаємо від Client Two разом з COO.",
+          "source": "client-two/STATE.md, станом на 30 лип. 2026",
+          "note": "Чемпіон на боці клієнта."
+        },
+        {
+          "id": "client-two-row-24",
+          "reportsTo": "client-two-row-21",
+          "reportsToAssumed": true,
+          "clientId": "client-two",
+          "side": "client",
+          "role": "Внутрішній розробник легасі-систем",
+          "person": "Person Fifteen",
+          "email": null,
+          "cares": "Власне місце. Уся облікова система тримається на ньому одному.",
+          "powers": [
+            "blocks"
+          ],
+          "scope": "Легасі-облік сімдесятих років і все, що з нього читає дані",
+          "cadence": "Поки не спілкуємось напряму",
+          "source": "client-two/STATE.md, станом на 30 лип. 2026",
+          "note": "У STATE.md записаний у графі «конкуренти». Прізвища не знаємо. Має стати союзником, інакше стає найдешевшим способом сказати нам ні."
+        },
+        {
+          "id": "client-two-row-25",
+          "clientId": "client-two",
+          "side": "alpina",
+          "role": "Пресейл і демо",
+          "person": "Person Eleven",
+          "email": "person-nine@example.com",
+          "cares": "Щоб PoC показав вигоду раніше, ніж закінчиться терпіння президента",
+          "powers": [
+            "approves"
+          ],
+          "scope": "Що входить у демо і що ми обіцяємо на дзвінку",
+          "cadence": "Щотижневий дзвінок з Client Two",
+          "source": "client-two/STATE.md, станом на 30 лип. 2026"
+        }
+      ]
+    }
+  ]
+}
