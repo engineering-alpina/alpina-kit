@@ -1,15 +1,17 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { navigableServices, services } from '@alpina/contracts';
+import { moduleServices, serviceIconName, services } from '@alpina/contracts';
 
-import {
-  ModuleSwitcher,
-  NON_MODULE_SERVICE_IDS,
-  moduleServices,
-  serviceIcon,
-} from '../src/shell/module-switcher.js';
+import { ModuleSwitcher, serviceIcon } from '../src/shell/module-switcher.js';
 import { SidebarProvider } from '../src/ui/sidebar.js';
 import { TooltipProvider } from '../src/ui/tooltip.js';
+
+/**
+ * Which services belong in the menu is `@alpina/contracts`' problem now, and
+ * `test/modules.test.ts` over there covers it. What is left here is rendering:
+ * the icon name becomes a component and the group draws one external link per
+ * module.
+ */
 
 function renderSwitcher(props: React.ComponentProps<typeof ModuleSwitcher> = {}) {
   return render(
@@ -21,41 +23,18 @@ function renderSwitcher(props: React.ComponentProps<typeof ModuleSwitcher> = {})
   );
 }
 
-describe('moduleServices', () => {
-  it('lists every navigable service the registry has', () => {
-    const ids = moduleServices().map((s) => s.id);
-    const expected = navigableServices()
-      .map((s) => s.id)
-      .filter((id) => !NON_MODULE_SERVICE_IDS.includes(id));
-
-    expect(ids).toEqual(expected);
-    expect(ids.length).toBeGreaterThan(0);
+describe('serviceIcon', () => {
+  it('resolves a contracts icon name to a component', () => {
+    expect(serviceIconName('invoicing')).toBe('file-text');
+    expect(serviceIcon('invoicing')).toBeDefined();
   });
 
-  it('leaves out services the registry marks as not navigable', () => {
-    const ids = moduleServices().map((s) => s.id);
-    const notNavigable = services.filter((s) => s.domain === null || !s.status.startsWith('live'));
-
-    expect(notNavigable.length).toBeGreaterThan(0);
-    for (const service of notNavigable) {
-      expect(ids).not.toContain(service.id);
+  it('has a component for every name the registry can hand it', () => {
+    const fallback = serviceIcon('a-service-invented-tomorrow');
+    for (const service of services) {
+      if (serviceIconName(service.id) === 'square') continue;
+      expect(serviceIcon(service.id), service.id).not.toBe(fallback);
     }
-  });
-
-  it('leaves out the identity provider, which is not a module anyone opens', () => {
-    expect(navigableServices().map((s) => s.id)).toContain('sso');
-    expect(moduleServices().map((s) => s.id)).not.toContain('sso');
-  });
-
-  it('does not link a service back to itself', () => {
-    expect(moduleServices({ currentServiceId: 'upwork-crm' }).map((s) => s.id)).not.toContain(
-      'upwork-crm',
-    );
-    expect(moduleServices().map((s) => s.id)).toContain('upwork-crm');
-  });
-
-  it('honours an explicit exclusion', () => {
-    expect(moduleServices({ exclude: ['twenty'] }).map((s) => s.id)).not.toContain('twenty');
   });
 
   it('gives an unknown registry id a fallback icon rather than crashing', () => {
@@ -71,8 +50,6 @@ describe('<ModuleSwitcher>', () => {
 
     const expected = moduleServices();
     for (const service of expected) {
-      // Service names carry brackets and commas, so match the text and walk up
-      // rather than building a regex out of registry data.
       const link = screen.getByText(service.name).closest('a');
       expect(link, `no link rendered for ${service.id}`).not.toBeNull();
       expect(link!.getAttribute('href')).toBe(`https://${service.domain}`);
@@ -96,6 +73,13 @@ describe('<ModuleSwitcher>', () => {
 
     expect(hrefs).not.toContain('https://invoicing.alpina.solutions');
     expect(hrefs).toContain('https://upwork-crm.alpina.solutions');
+  });
+
+  it('honours an explicit exclusion', () => {
+    renderSwitcher({ exclude: ['twenty'] });
+    const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href'));
+
+    expect(hrefs.some((h) => h?.includes('twenty'))).toBe(false);
   });
 
   it('takes its label from the caller', () => {

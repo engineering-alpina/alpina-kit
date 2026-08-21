@@ -21,14 +21,21 @@ export { cn } from './lib/cn.js';
 export { useIsMobile, MOBILE_BREAKPOINT } from './lib/use-mobile.js';
 
 export { AppShell, ShellTopbar, type AppShellProps, type ShellBrand } from './shell/app-shell.js';
+export { ModuleSwitcher, serviceIcon, type ModuleSwitcherProps } from './shell/module-switcher.js';
+/**
+ * The module list itself is data, not UI, so it lives in `@alpina/contracts`
+ * where a consumer without React can read it. Re-exported here because these
+ * names shipped from `@alpina/ui` in v0.1.0 and an import that already works
+ * should keep working.
+ */
 export {
-  ModuleSwitcher,
   moduleServices,
-  serviceIcon,
+  serviceIconName,
   NON_MODULE_SERVICE_IDS,
-  type ModuleSwitcherProps,
+  SERVICE_ICON_NAMES,
+  FALLBACK_SERVICE_ICON_NAME,
   type ModuleServicesOptions,
-} from './shell/module-switcher.js';
+} from '@alpina/contracts';
 export { isActive, type NavGroup, type NavItem, type LinkRenderer } from './shell/nav.js';
 
 export {

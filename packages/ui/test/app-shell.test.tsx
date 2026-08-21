@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 
 import { AppShell } from '../src/shell/app-shell.js';
 import { isActive, type NavGroup } from '../src/shell/nav.js';
-import { moduleServices } from '../src/shell/module-switcher.js';
+import { moduleServices } from '@alpina/contracts';
 
 const groups: NavGroup[] = [
   {
