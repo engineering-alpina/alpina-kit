@@ -39,6 +39,7 @@ carries the "Alpina ERP" module switcher (plain links, edge composition).
 | invoicing          | invoicing.alpina.solutions  | `PRESALE/invoicing`                                   | 4418           | `invoicing` @ CT 211     | compose CT 210             | live              |
 | twenty (vendor)    | twenty.alpina-tech.org      | vendor, Hetzner                                       | —              | own                      | Hetzner                    | live              |
 | hub                | hub.alpina-tech.org         | `PRODUCT/alpina-hub`                                  | 4421           | `hub` schema, Hetzner    | Coolify Hetzner VM 101     | planned           |
+| case-builder       | cases.alpina-tech.org       | `PRESALE/alpina-tech-case-study`                      | 4422           | `case_builder`, Hetzner  | Coolify Hetzner VM 101     | planned           |
 
 Repo paths are relative to `~/github/alpina/ALPINA-TECH/`.
 

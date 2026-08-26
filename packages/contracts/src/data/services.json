@@ -1,6 +1,6 @@
 {
   "$comment": "Alpina fleet service registry. Canonical home moves to alpina-kit (Phase 1 of docs/superpowers/specs/2026-08-13-fleet-modularity-architecture-design.md). Keep FLEET.md in sync.",
-  "updated": "2026-08-21",
+  "updated": "2026-08-27",
   "services": [
     {
       "id": "upwork-crm",
@@ -12,7 +12,9 @@
       "deploy": "coolify@CT210",
       "health": "/api/health",
       "api": "/api/v1",
-      "mcp": ["crm_*"],
+      "mcp": [
+        "crm_*"
+      ],
       "status": "live",
       "auth": "oidc (Zitadel alpina-apps, in-app code flow; password fallback)"
     },
@@ -26,7 +28,9 @@
       "deploy": "compose CT 210 (/opt/alpina-comms)",
       "health": "/healthz",
       "api": "/api",
-      "mcp": ["comms_*"],
+      "mcp": [
+        "comms_*"
+      ],
       "status": "live (read API, ingest pending Gmail OAuth)",
       "auth": "API bearer tokens only, no UI login"
     },
@@ -157,6 +161,20 @@
       "mcp": [],
       "status": "live",
       "auth": "vendor login — SSO is enterprise-only"
+    },
+    {
+      "id": "case-builder",
+      "name": "Case Study Builder",
+      "domain": "cases.alpina-tech.org",
+      "repo": "alpina/ALPINA-TECH/PRESALE/alpina-tech-case-study",
+      "devPort": 4422,
+      "db": "case_builder (Hetzner data layer) + Garage S3 bucket",
+      "deploy": "Coolify alpina-internal (Hetzner VM 101)",
+      "health": "/api/health",
+      "api": "/api/v1",
+      "mcp": [],
+      "status": "planned",
+      "auth": "Zitadel SSO + email allowlist; public /share/[token] links"
     }
   ]
 }
