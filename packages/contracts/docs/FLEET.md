@@ -87,14 +87,15 @@ Repo paths are relative to `~/github/alpina/ALPINA-TECH/`.
   personal invoicing instance (password by design). Password login remains a
   fallback on upwork-crm and invoicing.
 - Zitadel LXC 112 is outside restic backups (open item from 2026-08-10).
-- `alpina-kit` does not exist yet (Phase 1); this registry is temporarily hosted
-  in upwork-crm.
+- `alpina-kit` lives at github.com/engineering-alpina/alpina-kit (private);
+  this file is the canonical registry copy.
 - portal, comms-hub and invoicing went live 2026-08-17 (compose on CT 210,
   per-hostname CF Access bypass apps, pg-backup cron on CT 211, portal media
   in the nightly restic staging). Contract prefill is live end-to-end
   (dedicated `invoicing-prefill` token, `/api/v1/contracts` deployed).
-  Still open: comms-hub ingest waits on Gmail OAuth; Uptime Kuma (CT 203) has
-  no admin account yet, so the new services have no monitors.
+  Still open: comms-hub ingest waits on Gmail OAuth. Uptime Kuma (CT 203)
+  monitors every live fleet service since 2026-08-27, with Telegram alerts
+  through the sync-worker bot.
 - A service answering on `/` is not a working service. The portal's `/admin`
   returned 500 from its first deploy until 2026-08-18 while `/` answered 307,
   so it read as live. Smoke-test the route that actually does the work.
