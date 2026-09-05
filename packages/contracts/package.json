@@ -1,6 +1,6 @@
 {
   "name": "@alpina/contracts",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Zod schemas and degrade-safe typed clients for cross-service reads, plus the canonical fleet registry and design system.",
   "license": "UNLICENSED",
   "type": "module",
