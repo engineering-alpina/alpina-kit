@@ -1,6 +1,6 @@
 {
-  "$comment": "Alpina fleet service registry. Canonical home moves to alpina-kit (Phase 1 of docs/superpowers/specs/2026-08-13-fleet-modularity-architecture-design.md). Keep FLEET.md in sync.",
-  "updated": "2026-08-27",
+  "$comment": "Alpina fleet service registry, canonical home. FLEET.md is generated prose about this file, not a second source. A row's `status` starts with 'live' only when the host actually answers: helpers filter on that prefix. 'retiring' marks a host that still answers but is scheduled to go away, so a consumer can stop linking to it without it disappearing from the inventory. Audited against reality 2026-09-05; upwork-crm.domain stays on alpina.solutions until decision D1 in the 2026-09-02 fleet audit spec settles the cutover.",
+  "updated": "2026-09-05",
   "services": [
     {
       "id": "upwork-crm",
@@ -52,28 +52,28 @@
       "id": "team-registry",
       "name": "Team & Stakeholders",
       "domain": "team.alpina.solutions",
-      "repo": "not in local ~/github/alpina tree; locate via gh (engineering-alpina)",
+      "repo": "personal/ALPINA/team.alpina.solutions",
       "devPort": null,
       "db": "in-repo data",
       "deploy": "proxy CT213 -> CT229:4991",
       "health": null,
       "api": "/api/stakeholders.json",
       "mcp": [],
-      "status": "live",
+      "status": "retiring (superseded by hub, see Phase B)",
       "auth": "oauth2-proxy@CT213 (Zitadel static-sites-proxy client)"
     },
     {
       "id": "recruiting",
       "name": "Recruiting",
       "domain": "recruiting.alpina.solutions",
-      "repo": "see alpina-brain log 2026-08-11",
+      "repo": "personal/ALPINA/alpina-recruiting (subdir recruiting/, Docusaurus)",
       "devPort": null,
       "db": null,
       "deploy": "caddy@CT213",
       "health": null,
       "api": null,
       "mcp": [],
-      "status": "live",
+      "status": "retiring (superseded by hub recruiting module, see Phase B)",
       "auth": "oauth2-proxy@CT213 (Zitadel static-sites-proxy client)"
     },
     {
@@ -175,6 +175,36 @@
       "mcp": [],
       "status": "planned",
       "auth": "Zitadel SSO + email allowlist; public /share/[token] links"
+    },
+    {
+      "id": "ats",
+      "name": "Recruiting ATS",
+      "shortName": "ATS",
+      "domain": "recruitment.alpina.solutions",
+      "repo": "personal/ALPINA/alpina-recruiting (subdir ats/)",
+      "devPort": 3000,
+      "db": "recruitment@CT211",
+      "deploy": "coolify@CT210 (app pvlliyuep0admwttb4t1lwc4, nixpacks, base /ats)",
+      "health": null,
+      "api": "/api",
+      "mcp": [],
+      "status": "live",
+      "auth": "Payload admin auth; whole host behind CF Access today, candidate paths to be split out in Phase B"
+    },
+    {
+      "id": "cases",
+      "name": "Case study library",
+      "shortName": "Cases",
+      "domain": "cases.alpina.solutions",
+      "repo": "alpina/ALPINA-TECH/PRESALE/alpina-tech-case-study",
+      "devPort": 4321,
+      "db": null,
+      "deploy": "static on CT 213 (Caddy, /var/www/cases)",
+      "health": null,
+      "api": null,
+      "mcp": [],
+      "status": "live",
+      "auth": "oauth2-proxy forward_auth (Zitadel static-sites-proxy) since 2026-09-05"
     }
   ]
 }
