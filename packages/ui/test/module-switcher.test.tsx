@@ -85,8 +85,8 @@ describe('<ModuleSwitcher>', () => {
     renderSwitcher({ currentServiceId: 'invoicing' });
     const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href'));
 
-    expect(hrefs).not.toContain('https://invoicing.alpina.solutions');
-    expect(hrefs).toContain('https://upwork-crm.alpina.solutions');
+    expect(hrefs).not.toContain('https://invoicing.alpina-tech.org');
+    expect(hrefs).toContain('https://upwork-crm.alpina-tech.org');
   });
 
   it('honours an explicit exclusion', () => {
