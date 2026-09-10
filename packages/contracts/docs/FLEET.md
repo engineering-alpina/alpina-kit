@@ -28,7 +28,7 @@ carries the "Alpina ERP" module switcher (plain links, edge composition).
 
 | id                 | domain                      | repo                                                  | dev port       | DB                       | deploy                     | status            |
 | ------------------ | --------------------------- | ----------------------------------------------------- | -------------- | ------------------------ | -------------------------- | ----------------- |
-| upwork-crm         | upwork-crm.alpina.solutions | `PRESALE/upwork-crm`                                  | 4417           | `upwork_crm` @ CT 211    | Coolify CT 210             | live              |
+| upwork-crm         | upwork-crm.alpina-tech.org  | `PRESALE/upwork-crm`                                  | 4417           | `upwork_crm` @ hetzner   | Coolify hetzner            | live              |
 | comms-hub          | comms.alpina.solutions      | `PRESALE/alpina-comms-hub`                            | — (libs + MCP) | `alpina_comms` @ CT 211  | compose CT 210             | live (read API)   |
 | portal             | clients.alpina.solutions    | `PRESALE/alpina-portal`                               | 4728           | `alpina_portal` @ CT 211 | compose CT 210             | live              |
 | team-registry      | team.alpina.solutions       | not in local tree; find via `gh` (engineering-alpina) | —              | in-repo data             | proxy CT 213 → CT 229:4991 | live              |

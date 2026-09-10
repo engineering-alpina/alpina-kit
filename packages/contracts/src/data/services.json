@@ -5,11 +5,11 @@
     {
       "id": "upwork-crm",
       "name": "Upwork CRM",
-      "domain": "upwork-crm.alpina.solutions",
+      "domain": "upwork-crm.alpina-tech.org",
       "repo": "alpina/ALPINA-TECH/PRESALE/UPwork-CRM",
       "devPort": 4417,
-      "db": "upwork_crm@CT211",
-      "deploy": "coolify@CT210",
+      "db": "upwork_crm@hetzner",
+      "deploy": "coolify@hetzner",
       "health": "/api/health",
       "api": "/api/v1",
       "mcp": [
