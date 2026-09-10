@@ -43,16 +43,16 @@ describe('module list', () => {
     // premature `"status": "live"` would put a dead link in the sidebar of
     // every other service at once, because they all render from this list and
     // none of them fetches to find out. `navigableServices()` is the only gate.
-    const hub = services.find((s) => s.id === 'hub');
-    expect(hub?.domain).toBe('hub.alpina-tech.org');
+    const hub = services.find((s) => s.id === 'expertise-os');
+    expect(hub?.domain).toBeNull();
     expect(hub?.status).toBe('planned');
-    expect(navigableServices().some((s) => s.id === 'hub')).toBe(false);
-    expect(moduleServices().some((s) => s.id === 'hub')).toBe(false);
+    expect(navigableServices().some((s) => s.id === 'expertise-os')).toBe(false);
+    expect(moduleServices().some((s) => s.id === 'expertise-os')).toBe(false);
   });
 
   it('drops every service whose status does not start with live', () => {
     const notLive = services.filter((s) => !s.status.startsWith('live')).map((s) => s.id);
-    expect(notLive).toContain('hub');
+    expect(notLive).toContain('expertise-os');
     for (const id of notLive) {
       expect(
         moduleServices().some((s) => s.id === id),
