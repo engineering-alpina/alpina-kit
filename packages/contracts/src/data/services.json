@@ -1,12 +1,12 @@
 {
   "$comment": "Alpina fleet service registry, canonical home. FLEET.md is generated prose about this file, not a second source. A row's `status` starts with 'live' only when the host actually answers: helpers filter on that prefix. 'retiring' marks a host that still answers but is scheduled to go away, so a consumer can stop linking to it without it disappearing from the inventory. Audited against reality 2026-09-05; upwork-crm.domain stays on alpina.solutions until decision D1 in the 2026-09-02 fleet audit spec settles the cutover.",
-  "updated": "2026-09-05",
+  "updated": "2026-09-10",
   "services": [
     {
       "id": "upwork-crm",
       "name": "Upwork CRM",
       "domain": "upwork-crm.alpina.solutions",
-      "repo": "alpina/ALPINA-TECH/PRESALE/upwork-crm",
+      "repo": "alpina/ALPINA-TECH/PRESALE/UPwork-CRM",
       "devPort": 4417,
       "db": "upwork_crm@CT211",
       "deploy": "coolify@CT210",
@@ -163,13 +163,14 @@
       "auth": "vendor login — SSO is enterprise-only"
     },
     {
-      "id": "case-builder",
-      "name": "Case Study Builder",
+      "id": "case-study-os-service",
+      "name": "Case Study OS (service)",
+      "shortName": "Case Study service",
       "domain": "cases.alpina-tech.org",
-      "repo": "alpina/ALPINA-TECH/PRESALE/alpina-tech-case-study",
+      "repo": "alpina/ALPINA-TECH/PRESALE/UP_Case-Study-OS",
       "devPort": 4422,
       "db": "case_builder (Hetzner data layer) + Garage S3 bucket",
-      "deploy": "Coolify alpina-internal (Hetzner VM 101)",
+      "deploy": "Coolify alpina-internal (Hetzner VM 101); migration in progress",
       "health": "/api/health",
       "api": "/api/v1",
       "mcp": [],
@@ -192,11 +193,11 @@
       "auth": "Payload admin auth; whole host behind CF Access today, candidate paths to be split out in Phase B"
     },
     {
-      "id": "cases",
-      "name": "Case study library",
+      "id": "case-study-os",
+      "name": "Case Study OS",
       "shortName": "Cases",
       "domain": "cases.alpina.solutions",
-      "repo": "alpina/ALPINA-TECH/PRESALE/alpina-tech-case-study",
+      "repo": "alpina/ALPINA-TECH/PRESALE/UP_Case-Study-OS",
       "devPort": 4321,
       "db": null,
       "deploy": "static on CT 213 (Caddy, /var/www/cases)",
@@ -205,6 +206,32 @@
       "mcp": [],
       "status": "live",
       "auth": "oauth2-proxy forward_auth (Zitadel static-sites-proxy) since 2026-09-05"
+    },
+    {
+      "id": "expertise-os",
+      "name": "Expertise OS",
+      "domain": null,
+      "repo": "alpina/ALPINA-TECH/PRESALE/UP_Expertise-OS",
+      "devPort": null,
+      "db": null,
+      "deploy": "content in git; no host yet",
+      "health": null,
+      "api": null,
+      "mcp": [],
+      "status": "planned"
+    },
+    {
+      "id": "industry-os",
+      "name": "Industry OS",
+      "domain": null,
+      "repo": "alpina/ALPINA-TECH/PRESALE/UP_Industry-OS",
+      "devPort": null,
+      "db": null,
+      "deploy": "content in git; no host yet",
+      "health": null,
+      "api": null,
+      "mcp": [],
+      "status": "planned"
     }
   ]
 }
