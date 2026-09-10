@@ -1,6 +1,6 @@
 {
   "name": "@alpina/ui",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "The flat Alpina design canon as CSS tokens, the AppShell whose module switcher reads the fleet registry, and the shadcn-style primitives every internal service shares.",
   "license": "UNLICENSED",
   "type": "module",
