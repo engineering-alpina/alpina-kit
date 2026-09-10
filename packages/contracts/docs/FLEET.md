@@ -36,10 +36,10 @@ carries the "Alpina ERP" module switcher (plain links, edge composition).
 | time (Kimai)       | time.alpina.solutions       | vendor (Kimai)                                        | —              | own                      | CT 229:4997                | live              |
 | sso (Zitadel)      | auth.alpina-tech.org        | vendor (Zitadel), Hetzner LXC 112                     | —              | own                      | Hetzner                    | live, fleet login |
 | proposal-generator | —                           | `PRESALE/proposal-generator`                          | —              | —                        | local CLI                  | local tool        |
-| invoicing          | invoicing.alpina.solutions  | `PRESALE/invoicing`                                   | 4418           | `invoicing` @ CT 211     | compose CT 210             | live              |
+| invoicing          | invoicing.alpina-tech.org   | `PRESALE/invoicing`                                   | 4418           | `invoicing` @ hetzner    | Coolify hetzner            | live              |
 | twenty (vendor)    | twenty.alpina-tech.org      | vendor, Hetzner                                       | —              | own                      | Hetzner                    | live              |
 | hub                | hub.alpina-tech.org         | `PRODUCT/alpina-hub`                                  | 4421           | `hub` schema, Hetzner    | Coolify Hetzner VM 101     | planned           |
-| case-study-os         | cases.alpina.solutions      | `PRESALE/UP_Case-Study-OS`                            | 4321           | —                        | static CT 213 (Caddy)      | live              |
+| case-study-os         | cases.alpina-tech.org       | `PRESALE/UP_Case-Study-OS`                            | 4321           | —                        | Coolify hetzner (nginx)    | live              |
 | case-study-os-service | cases.alpina-tech.org       | `PRESALE/UP_Case-Study-OS`                            | 4422           | `case_builder`, Hetzner  | Coolify Hetzner VM 101     | planned           |
 | expertise-os          | —                           | `PRESALE/UP_Expertise-OS`                             | —              | —                        | content in git             | planned           |
 | industry-os           | —                           | `PRESALE/UP_Industry-OS`                              | —              | —                        | content in git             | planned           |
